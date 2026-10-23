@@ -1,0 +1,77 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+/* `dark:` sigue la clase .dark (tema del admin), no la preferencia del sistema. */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * Paleta estricta blanco y negro sobre los tokens de HeroUI.
+ * Negro #030712 · blanco #FFFFFF · grises #F4F4F5 #E4E4E7 #A1A1AA #52525B #18181B
+ */
+:root,
+.light,
+[data-theme="light"] {
+  --background: #ffffff;
+  --foreground: #030712;
+  --surface: #ffffff;
+  --surface-secondary: #f4f4f5;
+  --surface-tertiary: #e4e4e7;
+  --overlay: #ffffff;
+  --muted: #52525b;
+  --default: #f4f4f5;
+  --default-foreground: #18181b;
+  --accent: #030712;
+  --accent-foreground: #ffffff;
+  --field-background: #ffffff;
+  --field-border: #e4e4e7;
+  --field-border-width: 1px;
+  --border: #e4e4e7;
+  --separator: #e4e4e7;
+  --focus: #030712;
+  --link: #030712;
+  /* Rojo con contraste AA tanto como fondo (texto blanco) como texto sobre blanco. */
+  --danger: #dc2626;
+  --danger-foreground: #ffffff;
+}
+
+.dark,
+[data-theme="dark"] {
+  --background: #030712;
+  --foreground: #ffffff;
+  --surface: #18181b;
+  --surface-secondary: #1f1f23;
+  --surface-tertiary: #27272a;
+  --overlay: #18181b;
+  --muted: #a1a1aa;
+  --default: #27272a;
+  --default-foreground: #ffffff;
+  --accent: #ffffff;
+  --accent-foreground: #030712;
+  --field-background: #18181b;
+  --field-border: #27272a;
+  --field-border-width: 1px;
+  --border: #27272a;
+  --separator: #27272a;
+  --focus: #ffffff;
+  --link: #ffffff;
+  /* En oscuro, un rojo claro con texto oscuro cumple AA como fondo y como texto. */
+  --danger: #f87171;
+  --danger-foreground: #030712;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}

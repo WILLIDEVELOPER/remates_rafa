@@ -1,0 +1,50 @@
+{
+  "name": "remates-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "pnpm db:seed:remates && pnpm db:seed:admin",
+    "db:seed:remates": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env.local src/server/infrastructure/db/seed.ts",
+    "db:seed:admin": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env.local src/server/infrastructure/db/seed-admin.ts",
+    "db:admin-password": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env.local src/server/infrastructure/db/set-admin-password.ts",
+    "typecheck": "tsc --noEmit",
+    "storage:cors": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --env-file=.env.local src/server/infrastructure/services/set-bucket-cors.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1152.0",
+    "@aws-sdk/s3-request-presigner": "^3.1152.0",
+    "@heroui/react": "^3.2.6",
+    "@heroui/styles": "^3.2.6",
+    "@hookform/resolvers": "^5.9.2",
+    "@neondatabase/serverless": "^1.2.0",
+    "better-auth": "^1.7.11",
+    "drizzle-orm": "^0.45.4",
+    "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
+    "next": "16.4.2",
+    "next-themes": "^0.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.90.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "packageManager": "pnpm@11.22.0"
+}
