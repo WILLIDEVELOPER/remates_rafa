@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { WhatsappInlineButton } from "@/components/layout/whatsapp-button";
 import { EstadoChip } from "@/components/ui/estado-chip";
 import { RemateGridSkeleton } from "@/components/ui/remate-card-skeleton";
-import { WhatsappIcon } from "@/components/ui/whatsapp-icon";
 import { InquiryDialog } from "@/features/contact";
 import {
   RelatedRemates,
@@ -15,7 +15,7 @@ import {
 } from "@/features/remates";
 import { discountPercent, formatCOP, formatDate, formatLocation } from "@/lib/format";
 import { TIPO_LABELS } from "@/lib/remate-labels";
-import { getBaseUrl, getWhatsappUrl, SITE } from "@/lib/site";
+import { getBaseUrl, SITE } from "@/lib/site";
 import { getRemateBySlugAction } from "@/server/presentation/actions/remate-actions";
 
 async function loadRemate(slug: string) {
@@ -157,17 +157,9 @@ export default async function RemateDetailPage({ params }: PageProps<"/remates/[
 
             <div className="flex flex-col gap-3">
               <InquiryDialog remateId={remate.id} remateNombre={remate.nombre} />
-              <a
-                href={getWhatsappUrl(
-                  `Hola, quiero información sobre el remate "${remate.nombre}": ${baseUrl}/remates/${remate.slug}`,
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-11 items-center justify-center gap-2 rounded-full bg-[#25D366] text-sm font-medium text-white transition-colors hover:bg-[#1ebe5a]"
-              >
-                <WhatsappIcon className="size-5" />
-                Consultar por WhatsApp
-              </a>
+              <WhatsappInlineButton
+                message={`Hola, quiero información sobre el remate "${remate.nombre}": ${baseUrl}/remates/${remate.slug}`}
+              />
               <a
                 href={SITE.phoneHref}
                 className="flex h-11 items-center justify-center gap-2 rounded-full border border-border text-sm font-medium transition-colors hover:bg-surface-secondary"
