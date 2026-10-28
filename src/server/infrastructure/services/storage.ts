@@ -11,12 +11,25 @@ import type {
   StoredImageInfo,
 } from "../../domain/services/image-storage.ts";
 
-// Neon Object Storage es compatible con S3. El SDK lee AWS_ENDPOINT_URL_S3,
-// AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY y AWS_REGION del entorno.
+// Neon Object Storage es compatible con S3. El SDK lee AWS_ENDPOINT_URL_S3 del
+// entorno. Las credenciales y la región se toman de S3_ACCESS_KEY_ID,
+// S3_SECRET_ACCESS_KEY y S3_REGION (Netlify reserva los nombres AWS_*); si no
+// están definidas, el SDK usa AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY y AWS_REGION.
 let client: S3Client | undefined;
 
 function getClient(): S3Client {
-  client ??= new S3Client({ forcePathStyle: true });
+  if (!client) {
+    const accessKeyId = process.env.S3_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
+
+    client = new S3Client({
+      forcePathStyle: true,
+      ...(process.env.S3_REGION && { region: process.env.S3_REGION }),
+      ...(accessKeyId && secretAccessKey && {
+        credentials: { accessKeyId, secretAccessKey },
+      }),
+    });
+  }
   return client;
 }
 
