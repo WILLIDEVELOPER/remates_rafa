@@ -5,6 +5,9 @@ export const SITE = {
   /** Placeholder: reemplazar por el número real. */
   phoneDisplay: "+57 601 000 0000",
   phoneHref: "tel:+576010000000",
+  /** Placeholder: reemplazar por el WhatsApp real (código de país + número, sin "+" ni espacios). */
+  whatsappNumber: "573000000000",
+  whatsappMessage: "Hola, quiero información sobre los remates de vivienda.",
   email: "contacto@rematesvargas.co",
   address: "Bogotá D.C., Colombia",
   schedule: "Lunes a viernes, 8:00 a. m. – 6:00 p. m.",
@@ -19,6 +22,11 @@ export const NAV_LINKS = [
   { title: "Remates", href: "/remates" },
   { title: "Contacto", href: "/contacto" },
 ] as const;
+
+/** Enlace de chat de WhatsApp (wa.me, gratuito) con el mensaje ya escrito. */
+export function getWhatsappUrl(message: string = SITE.whatsappMessage): string {
+  return `https://wa.me/${SITE.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 
 export function getBaseUrl(): string {
   return (

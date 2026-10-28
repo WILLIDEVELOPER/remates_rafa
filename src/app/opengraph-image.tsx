@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/site";
 
@@ -6,7 +8,11 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 // Imagen por defecto al compartir el sitio; los remates usan su propia foto principal.
-export default function OpengraphImage() {
+export default async function OpengraphImage() {
+  // Se genera en el build (ruta estática), así que `public/` está disponible en disco.
+  const logo = await readFile(join(process.cwd(), "public", "logo.png"));
+  const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;
+
   return new ImageResponse(
     (
       <div
@@ -22,22 +28,8 @@ export default function OpengraphImage() {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div
-            style={{
-              width: 72,
-              height: 72,
-              borderRadius: 36,
-              background: "#ffffff",
-              color: "#030712",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 30,
-              fontWeight: 700,
-            }}
-          >
-            RV
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse no usa next/image */}
+          <img src={logoSrc} alt="" height={96} width={116} />
           <div style={{ fontSize: 38, fontWeight: 600 }}>{SITE.name}</div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

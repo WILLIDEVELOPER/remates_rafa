@@ -1,5 +1,6 @@
 import { PublicFooter } from "@/components/layout/public-footer";
 import { PublicNavbar } from "@/components/layout/public-navbar";
+import { WhatsappButton } from "@/components/layout/whatsapp-button";
 
 export default function PublicLayout({ children }: LayoutProps<"/">) {
   return (
@@ -15,6 +16,7 @@ export default function PublicLayout({ children }: LayoutProps<"/">) {
         {children}
       </main>
       <PublicFooter />
+      <WhatsappButton />
     </>
   );
 }
