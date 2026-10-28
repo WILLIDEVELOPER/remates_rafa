@@ -6,7 +6,12 @@ import { redirect } from "next/navigation";
 import { isAdminRole } from "../../domain/entities/user.ts";
 import { UnauthorizedError } from "../../domain/errors/unauthorized-error.ts";
 import { auth } from "../../infrastructure/services/auth.ts";
-import { loginSchema, safeAdminRedirect } from "../validators/auth-schema.ts";
+import { requireAdmin } from "../auth/require-admin.ts";
+import {
+  changePasswordSchema,
+  loginSchema,
+  safeAdminRedirect,
+} from "../validators/auth-schema.ts";
 import { fail, ok, type ActionResult } from "./action-result.ts";
 
 export async function loginAction(
@@ -39,6 +44,40 @@ export async function loginAction(
     }
 
     return ok({ redirectTo: safeAdminRedirect(next) });
+  } catch (error) {
+    return fail(error);
+  }
+}
+
+export async function changePasswordAction(input: unknown): Promise<ActionResult<null>> {
+  try {
+    await requireAdmin();
+    const { currentPassword, newPassword } = changePasswordSchema.parse(input);
+
+    try {
+      // Cierra las demás sesiones del usuario y conserva la actual.
+      await auth.api.changePassword({
+        body: { currentPassword, newPassword, revokeOtherSessions: true },
+        headers: await headers(),
+      });
+    } catch (error) {
+      if (error instanceof APIError && error.statusCode === 429) {
+        throw new UnauthorizedError("Demasiados intentos. Espera un momento e inténtalo de nuevo.");
+      }
+      if (error instanceof APIError && error.statusCode < 500) {
+        return {
+          ok: false,
+          error: {
+            code: "VALIDATION",
+            message: "La contraseña actual no es correcta.",
+            fieldErrors: { currentPassword: ["La contraseña actual no es correcta."] },
+          },
+        };
+      }
+      throw error;
+    }
+
+    return ok(null);
   } catch (error) {
     return fail(error);
   }

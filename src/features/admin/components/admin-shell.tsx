@@ -7,7 +7,7 @@ import {
   Dropdown,
   useOverlayState,
 } from "@heroui/react";
-import { ExternalLink, LogOut, Menu, Moon, Sun } from "lucide-react";
+import { ExternalLink, KeyRound, LogOut, Menu, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -89,10 +89,15 @@ export function AdminShell({ user, unread, children }: AdminShellProps) {
                 </div>
                 <Dropdown.Menu
                   onAction={(key) => {
+                    if (key === "account") router.push("/admin/cuenta");
                     if (key === "site") router.push("/");
                     if (key === "logout") void logout();
                   }}
                 >
+                  <Dropdown.Item id="account" textValue="Mi cuenta">
+                    <KeyRound className="size-4 shrink-0 text-muted" />
+                    Mi cuenta y contraseña
+                  </Dropdown.Item>
                   <Dropdown.Item id="site" textValue="Ver sitio público">
                     <ExternalLink className="size-4 shrink-0 text-muted" />
                     Ver sitio público
