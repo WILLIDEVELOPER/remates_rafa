@@ -72,7 +72,7 @@ export function ContactForm({ remateId, defaultMessage, onSuccess }: ContactForm
         <Field control={control} name="nombre" label="Nombre completo" autoComplete="name" placeholder="Tu nombre" required />
         <Field control={control} name="email" label="Correo electrónico" type="email" autoComplete="email" placeholder="tu@correo.com" required />
       </div>
-      <Field control={control} name="telefono" label="Teléfono (opcional)" type="tel" autoComplete="tel" placeholder="+57 300 000 0000" />
+      <Field control={control} name="telefono" label="Teléfono (opcional)" type="tel" autoComplete="tel" placeholder="+57 311 482 6905" />
 
       <Controller
         control={control}

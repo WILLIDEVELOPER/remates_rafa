@@ -75,7 +75,7 @@ export function ReviewForm({ remateId, onSuccess }: ReviewFormProps) {
       <div hidden={step !== 1} className="flex flex-col gap-4">
         <Field control={control} name="nombre" label="Nombre completo" autoComplete="name" placeholder="Tu nombre" />
         <Field control={control} name="email" label="Correo electrónico" type="email" autoComplete="email" placeholder="tu@correo.com" />
-        <Field control={control} name="telefono" label="Número de teléfono" type="tel" autoComplete="tel" placeholder="+57 300 000 0000" />
+        <Field control={control} name="telefono" label="Número de teléfono" type="tel" autoComplete="tel" placeholder="+57 311 482 6905" />
         <p className="text-xs text-muted">
           Tu correo y tu teléfono no se publican: en la reseña solo se muestran tu nombre y tu comentario.
         </p>
@@ -106,9 +106,12 @@ export function ReviewForm({ remateId, onSuccess }: ReviewFormProps) {
             </TextField>
           )}
         />
-        <p className="-mt-2 text-right text-xs text-muted">
-          {comentario.length} / {REVIEW_MAX}
-        </p>
+        <div className="-mt-2 flex items-start justify-between gap-4 text-xs text-muted">
+          <p>Sin enlaces, datos de contacto, emojis ni lenguaje ofensivo.</p>
+          <p className="shrink-0">
+            {comentario.length} / {REVIEW_MAX}
+          </p>
+        </div>
 
         {/* Campo trampa anti-spam: oculto para personas, los bots suelen llenarlo. */}
         <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">

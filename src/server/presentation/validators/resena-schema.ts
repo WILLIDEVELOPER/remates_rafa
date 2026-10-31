@@ -3,14 +3,11 @@ import {
   RESENA_COMENTARIO_MAX,
   RESENA_COMENTARIO_MIN,
 } from "../../domain/entities/resena.ts";
+import { checkEmail, checkPhone } from "../../domain/rules/contact-rules.ts";
+import { checkComentario, checkNombre } from "../../domain/rules/content-rules.ts";
+import { checkedField } from "./checked-field.ts";
 
-const nombre = z
-  .string()
-  .trim()
-  .min(2, "Ingresa tu nombre.")
-  .max(120, "El nombre es demasiado largo.");
-
-const comentario = z
+const comentarioEditable = z
   .string()
   .trim()
   .min(RESENA_COMENTARIO_MIN, `Cuéntanos un poco más (mínimo ${RESENA_COMENTARIO_MIN} caracteres).`)
@@ -22,26 +19,17 @@ export const remateResenasIdSchema = z.uuid("Identificador de remate inválido."
 
 export const createResenaSchema = z.object({
   remateId: remateResenasIdSchema,
-  nombre,
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1, "Ingresa tu correo electrónico.")
-    .max(255)
-    .pipe(z.email("Ingresa un correo electrónico válido.")),
-  telefono: z
-    .string()
-    .trim()
-    .min(1, "Ingresa tu número de teléfono.")
-    .regex(/^\+?[\d\s-]{7,20}$/, "Ingresa un teléfono válido."),
-  comentario,
+  nombre: checkedField(checkNombre, 200),
+  email: checkedField(checkEmail, 300),
+  telefono: checkedField(checkPhone, 60),
+  comentario: checkedField(checkComentario, RESENA_COMENTARIO_MAX * 2),
   /** Campo trampa: los usuarios reales no lo ven ni lo llenan. */
   website: z.string().max(200).optional(),
 });
 
+/** El administrador puede reescribir libremente (p. ej. quitando una grosería). */
 export const updateResenaSchema = z.object({
   id: resenaIdSchema,
-  nombre,
-  comentario,
+  nombre: z.string().trim().min(2, "Indica el nombre.").max(120, "El nombre es demasiado largo."),
+  comentario: comentarioEditable,
 });

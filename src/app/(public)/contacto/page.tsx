@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 const CONTACT_ITEMS = [
   { icon: Phone, label: "Teléfono", value: SITE.phoneDisplay, href: SITE.phoneHref },
-  { icon: Mail, label: "Correo", value: SITE.email, href: `mailto:${SITE.email}` },
+  ...SITE.emails.map((email) => ({ icon: Mail, label: "Correo", value: email, href: `mailto:${email}` })),
   { icon: MapPin, label: "Ubicación", value: SITE.address },
   { icon: Clock, label: "Horario", value: SITE.schedule },
 ] as const;
@@ -44,7 +44,7 @@ export default function ContactPage() {
             );
 
             return (
-              <li key={item.label}>
+              <li key={`${item.label}-${item.value}`}>
                 {"href" in item ? (
                   <a href={item.href} className="flex items-center gap-4 transition-opacity hover:opacity-70">
                     {content}

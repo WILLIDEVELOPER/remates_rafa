@@ -26,7 +26,7 @@ export function Logo({ tone = "dark", className }: LogoProps) {
       />
       <span
         className={cn(
-          "text-lg font-medium tracking-tight whitespace-nowrap",
+          "flex flex-col gap-1",
           auto
             ? "text-[#030712] dark:text-white"
             : onDark
@@ -34,7 +34,13 @@ export function Logo({ tone = "dark", className }: LogoProps) {
               : "text-[#030712]",
         )}
       >
-        Remates Vargas
+        <span className="text-lg leading-none font-semibold tracking-tight whitespace-nowrap">
+          Remates Vargas
+        </span>
+        <span className="flex items-center gap-2 text-[0.625rem] leading-none font-medium tracking-[0.3em] uppercase opacity-60">
+          Consultores
+          <span aria-hidden className="h-px flex-1 bg-current opacity-50" />
+        </span>
       </span>
     </div>
   );

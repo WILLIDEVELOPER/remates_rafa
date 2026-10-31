@@ -1,25 +1,26 @@
 import { z } from "zod";
+import type { Checked } from "@/server/domain/rules/checked";
+import { checkEmail, checkPhone } from "@/server/domain/rules/contact-rules";
+import { checkComentario, checkNombre, COMENTARIO_MAX } from "@/server/domain/rules/content-rules";
 
-export const REVIEW_MIN = 10;
-export const REVIEW_MAX = 1000;
+export const REVIEW_MAX = COMENTARIO_MAX;
+
+/**
+ * Mismas reglas que valida el servidor (que es quien las hace cumplir):
+ * aquí solo sirven para avisar antes de enviar.
+ */
+function checked(check: (raw: string) => Checked<string>) {
+  return z.string().superRefine((value, ctx) => {
+    const result = check(value);
+    if (!result.ok) ctx.addIssue({ code: "custom", message: result.error });
+  });
+}
 
 export const reviewFormSchema = z.object({
-  nombre: z.string().trim().min(2, "Ingresa tu nombre.").max(120, "El nombre es demasiado largo."),
-  email: z
-    .string()
-    .trim()
-    .min(1, "Ingresa tu correo electrónico.")
-    .pipe(z.email("Ingresa un correo electrónico válido.")),
-  telefono: z
-    .string()
-    .trim()
-    .min(1, "Ingresa tu número de teléfono.")
-    .regex(/^\+?[\d\s-]{7,20}$/, "Ingresa un teléfono válido."),
-  comentario: z
-    .string()
-    .trim()
-    .min(REVIEW_MIN, `Cuéntanos un poco más (mínimo ${REVIEW_MIN} caracteres).`)
-    .max(REVIEW_MAX, `La reseña no puede superar ${REVIEW_MAX} caracteres.`),
+  nombre: checked(checkNombre),
+  email: checked(checkEmail),
+  telefono: checked(checkPhone),
+  comentario: checked(checkComentario),
   website: z.string().max(200),
 });
 

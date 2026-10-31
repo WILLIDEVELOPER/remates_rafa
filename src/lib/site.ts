@@ -2,16 +2,16 @@ export const SITE = {
   name: "Remates Vargas",
   description:
     "Remates de vivienda en Colombia: casas, apartamentos, lotes y locales con precios por debajo del mercado y acompañamiento jurídico.",
-  /** Teléfono visible en la web: mismo número del WhatsApp secundario. */
-  phoneDisplay: "+57 323 273 0838",
-  phoneHref: "tel:+573232730838",
+  /** Teléfono visible en la web: mismo número del WhatsApp principal. */
+  phoneDisplay: "+57 318 774 0911",
+  phoneHref: "tel:+573187740911",
   /** WhatsApp de atención: `number` con código de país (57) y sin "+" ni espacios. */
   whatsappContacts: [
     { label: "Principal", number: "573187740911", display: "318 774 0911" },
     { label: "Secundario", number: "573232730838", display: "323 273 0838" },
   ],
   whatsappMessage: "Hola, quiero información sobre los remates de vivienda.",
-  email: "contacto@rematesvargas.co",
+  emails: ["2952vargas@gmail.com", "Voljink@gmail.com"],
   address: "Bucaramanga, Santander, Colombia",
   schedule: "Lunes a viernes, 8:00 a. m. – 6:00 p. m.",
 } as const;

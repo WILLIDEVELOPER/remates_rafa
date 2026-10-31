@@ -31,7 +31,7 @@ export default async function LegalPage({ params }: PageProps<"/legal/[doc]">) {
         Este documento está pendiente de redacción y revisión legal por parte
         de {SITE.name}. Mientras tanto, para cualquier consulta sobre el
         tratamiento de tus datos o las condiciones del servicio puedes
-        escribirnos a {SITE.email}.
+        escribirnos a {SITE.emails.join(" o ")}.
       </p>
     </div>
   );

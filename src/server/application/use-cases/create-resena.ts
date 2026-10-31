@@ -1,4 +1,4 @@
-import { assertResenaRules } from "../../domain/entities/resena.ts";
+import { normalizeResena } from "../../domain/entities/resena.ts";
 import { RemateNotFoundError } from "../../domain/errors/remate-not-found-error.ts";
 import type { RemateRepository } from "../../domain/repositories/remate-repository.ts";
 import type { ResenaRepository } from "../../domain/repositories/resena-repository.ts";
@@ -14,15 +14,7 @@ export class CreateResena {
   }
 
   async execute(input: CreateResenaInput): Promise<{ id: string }> {
-    const data = {
-      remateId: input.remateId,
-      nombre: input.nombre.trim(),
-      email: input.email.trim().toLowerCase(),
-      telefono: input.telefono.trim(),
-      comentario: input.comentario.trim(),
-    };
-
-    assertResenaRules(data);
+    const data = normalizeResena(input);
 
     // Solo se reseñan remates visibles en el sitio.
     const remate = await this.remates.findById(data.remateId);

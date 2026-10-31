@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { checkEmail, checkPhone } from "../../domain/rules/contact-rules.ts";
+import { checkedField } from "./checked-field.ts";
 
 export const contactRequestSchema = z.object({
   nombre: z
@@ -6,20 +8,10 @@ export const contactRequestSchema = z.object({
     .trim()
     .min(2, "Ingresa tu nombre.")
     .max(120, "El nombre es demasiado largo."),
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1, "Ingresa tu correo electrónico.")
-    .max(255)
-    .pipe(z.email("Ingresa un correo electrónico válido.")),
+  email: checkedField(checkEmail, 300),
   telefono: z.preprocess(
-    (value) => (value === "" ? undefined : value),
-    z
-      .string()
-      .trim()
-      .regex(/^\+?[\d\s-]{7,20}$/, "Ingresa un teléfono válido.")
-      .optional(),
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    checkedField(checkPhone, 60).optional(),
   ),
   mensaje: z
     .string()

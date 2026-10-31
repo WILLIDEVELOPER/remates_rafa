@@ -50,12 +50,14 @@ export function PublicFooter() {
                   {SITE.phoneDisplay}
                 </a>
               </li>
-              <li>
-                <a href={`mailto:${SITE.email}`} className="flex items-center gap-2 break-all transition-colors hover:text-foreground">
-                  <Mail className="size-4 shrink-0" />
-                  {SITE.email}
-                </a>
-              </li>
+              {SITE.emails.map((email) => (
+                <li key={email}>
+                  <a href={`mailto:${email}`} className="flex items-center gap-2 break-all transition-colors hover:text-foreground">
+                    <Mail className="size-4 shrink-0" />
+                    {email}
+                  </a>
+                </li>
+              ))}
               <li className="flex items-center gap-2">
                 <MapPin className="size-4 shrink-0" />
                 {SITE.address}
