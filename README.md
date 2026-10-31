@@ -2,8 +2,8 @@
 
 Aplicación web para publicar y gestionar **remates de vivienda en Colombia**.
 
-- **Sitio público**: landing, listado filtrable (con filtros en la URL), detalle con galería y mapa, contacto.
-- **Panel administrativo** (`/admin`): dashboard, CRUD de remates con subida de imágenes, bandeja de solicitudes y limpieza de imágenes huérfanas.
+- **Sitio público**: landing, listado filtrable (con filtros en la URL), detalle con galería, mapa y reseñas, contacto.
+- **Panel administrativo** (`/admin`): dashboard, CRUD de remates con subida de imágenes, bandeja de solicitudes, moderación de reseñas por remate y limpieza de imágenes huérfanas.
 
 ## Stack
 
@@ -33,7 +33,7 @@ src/server/
 Las Server Actions son la frontera entre la UI y los casos de uso: validan con Zod, ejecutan el caso de
 uso y devuelven `{ ok, data }` o `{ ok: false, error }`. Toda acción administrativa llama a `requireAdmin()`.
 
-**Frontend → Feature-Based Architecture** (`src/features/`). Cada feature (`landing`, `remates`, `contact`,
+**Frontend → Feature-Based Architecture** (`src/features/`). Cada feature (`landing`, `remates`, `contact`, `reviews`,
 `auth`, `admin`) es autónomo y expone un `index.ts`. **Ningún feature importa de otro**: lo compartido vive en
 `src/components/ui`, `src/components/layout` y `src/lib`, y las páginas de `src/app` los componen.
 
@@ -41,7 +41,7 @@ uso y devuelven `{ ok, data }` o `{ ok: false, error }`. Toda acción administra
 src/
   app/              Rutas (público en (public), panel en admin/(panel), login en admin/(auth))
   components/       Compartidos: ui/, layout/, branding/
-  features/         landing · remates · contact · auth · admin
+  features/         landing · remates · contact · reviews · auth · admin
   lib/              Utilidades (formato COP/fechas, slug, datos de Colombia, constantes del sitio)
   server/           Backend (ver arriba)
   proxy.ts          Protege /admin/* (en Next 16 reemplaza a middleware.ts)

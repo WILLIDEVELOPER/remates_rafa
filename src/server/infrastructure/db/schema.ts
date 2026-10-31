@@ -152,6 +152,22 @@ export const remates = pgTable(
 export type RemateRow = typeof remates.$inferSelect;
 export type NewRemateRow = typeof remates.$inferInsert;
 
+export const resenas = pgTable(
+  "resenas",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    remateId: uuid("remate_id")
+      .notNull()
+      .references(() => remates.id, { onDelete: "cascade" }),
+    nombre: varchar("nombre", { length: 120 }).notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    telefono: varchar("telefono", { length: 30 }).notNull(),
+    comentario: text("comentario").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("resenas_remate_created_idx").on(t.remateId, t.createdAt)],
+);
+
 export const solicitudesContacto = pgTable(
   "solicitudes_contacto",
   {

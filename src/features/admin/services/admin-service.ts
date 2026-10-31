@@ -8,4 +8,8 @@ export {
 } from "@/server/presentation/actions/remate-actions";
 export { deleteOrphanImagesAction } from "@/server/presentation/actions/image-actions";
 export { createImageUploadsAction } from "@/server/presentation/actions/upload-actions";
+export {
+  deleteResenaAction,
+  updateResenaAction,
+} from "@/server/presentation/actions/resena-actions";
 export { setContactRequestReadAction } from "@/server/presentation/actions/contact-actions";

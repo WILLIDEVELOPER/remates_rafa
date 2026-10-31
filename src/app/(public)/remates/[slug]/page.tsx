@@ -13,6 +13,7 @@ import {
   RemateLocation,
   RemateSpecs,
 } from "@/features/remates";
+import { RemateReviews } from "@/features/reviews";
 import { discountPercent, formatCOP, formatDate, formatLocation } from "@/lib/format";
 import { TIPO_LABELS } from "@/lib/remate-labels";
 import { getBaseUrl, SITE } from "@/lib/site";
@@ -129,6 +130,9 @@ export default async function RemateDetailPage({ params }: PageProps<"/remates/[
             <p className="leading-relaxed whitespace-pre-line text-muted">{remate.descripcion}</p>
           </section>
           <RemateLocation remate={remate} />
+          <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-surface-secondary" />}>
+            <RemateReviews remateId={remate.id} remateNombre={remate.nombre} />
+          </Suspense>
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
