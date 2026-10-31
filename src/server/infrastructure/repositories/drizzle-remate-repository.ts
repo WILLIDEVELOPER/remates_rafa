@@ -89,6 +89,17 @@ function toUpdateValues(changes: RemateChanges) {
   };
 }
 
+// Búsqueda aproximada (pg_trgm): tolera errores de tipeo, letras de más o de
+// menos y tildes. 0 = nada en común, 1 = coincidencia exacta.
+const FUZZY_THRESHOLD = 0.45;
+
+function fuzzyScore(search: string): SQL<number> {
+  return sql<number>`word_similarity(
+    unaccent('unaccent', lower(${search})),
+    unaccent('unaccent', lower(concat_ws(' ', ${remates.nombre}, ${remates.ciudad}, ${remates.municipio}, ${remates.departamento})))
+  )`;
+}
+
 function buildWhere(filters: RemateFilters): SQL | undefined {
   const conditions: (SQL | undefined)[] = [];
 
@@ -98,6 +109,7 @@ function buildWhere(filters: RemateFilters): SQL | undefined {
       or(
         sql`${remates.searchVector} @@ websearch_to_tsquery('spanish', ${search})`,
         ilike(remates.nombre, `%${escapeLike(search)}%`),
+        sql`${fuzzyScore(search)} >= ${FUZZY_THRESHOLD}`,
       ),
     );
   }
@@ -130,8 +142,12 @@ function buildWhere(filters: RemateFilters): SQL | undefined {
   return and(...conditions);
 }
 
-function buildOrderBy(sort: RemateSort): SQL[] {
+function buildOrderBy(sort: RemateSort, search?: string): SQL[] {
   const tieBreak = [desc(remates.createdAt), asc(remates.id)];
+  // Con texto de búsqueda y orden por defecto, primero los más parecidos.
+  if (search && sort === "recientes") {
+    return [desc(fuzzyScore(search)), ...tieBreak];
+  }
 
   switch (sort) {
     case "precio_asc":
@@ -185,7 +201,7 @@ export class DrizzleRemateRepository implements RemateRepository {
         .select(columns)
         .from(remates)
         .where(where)
-        .orderBy(...buildOrderBy(sort))
+        .orderBy(...buildOrderBy(sort, filters.search?.trim()))
         .limit(pageSize)
         .offset((page - 1) * pageSize),
       this.db.select({ total: count() }).from(remates).where(where),

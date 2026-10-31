@@ -10,7 +10,6 @@ import { ESTADO_LABELS, ESTADO_VALUES, type EstadoRemateKey } from "@/lib/remate
 
 const BAR_COLOR: Record<EstadoRemateKey, string> = {
   disponible: "bg-success",
-  en_remate: "bg-warning",
   adjudicado: "bg-foreground/40",
   suspendido: "bg-danger",
 };

@@ -4,7 +4,6 @@ import { ESTADO_LABELS, type EstadoRemateKey } from "@/lib/remate-labels";
 
 const ESTADO_COLOR = {
   disponible: "success",
-  en_remate: "warning",
   adjudicado: "default",
   suspendido: "danger",
 } as const satisfies Record<EstadoRemateKey, "success" | "warning" | "default" | "danger">;

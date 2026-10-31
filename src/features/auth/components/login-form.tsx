@@ -52,7 +52,7 @@ export function LoginForm({ next }: LoginFormProps) {
             className="w-full"
           >
             <Label>Correo electrónico</Label>
-            <Input placeholder="admin@remates.co" />
+            <Input placeholder="tucorreo@ejemplo.com" />
             <FieldError>{fieldState.error?.message}</FieldError>
           </TextField>
         )}

@@ -9,7 +9,6 @@ export const TIPO_LABELS = {
 
 export const ESTADO_LABELS = {
   disponible: "Disponible",
-  en_remate: "En remate",
   adjudicado: "Adjudicado",
   suspendido: "Suspendido",
 } as const;

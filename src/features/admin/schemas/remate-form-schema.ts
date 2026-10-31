@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { ESTADO_VALUES, TIPO_VALUES } from "@/lib/remate-labels";
 
-export const MAX_IMAGES = 10;
+export const MAX_IMAGES = 30;
 export const MAX_IMAGE_MB = 5;
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 

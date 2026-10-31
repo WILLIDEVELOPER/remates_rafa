@@ -12,7 +12,7 @@ const VALUE_PROPS = [
     icon: TrendingDown,
     title: "Precios bajo mercado",
     description:
-      "Los remates parten de un precio base inferior al avalúo comercial, con descuentos que pueden superar el 30 %.",
+      "Los remates parten de un precio base inferior al avalúo comercial, con descuentos de hasta el 30 %.",
   },
   {
     icon: Handshake,

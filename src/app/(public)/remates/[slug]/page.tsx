@@ -53,7 +53,6 @@ export async function generateMetadata({
 
 const AVAILABILITY = {
   disponible: "https://schema.org/InStock",
-  en_remate: "https://schema.org/LimitedAvailability",
   adjudicado: "https://schema.org/SoldOut",
   suspendido: "https://schema.org/Discontinued",
 } as const;
