@@ -1,4 +1,4 @@
-import { BadgeCheck, FileCheck2, Wallet } from "lucide-react";
+import { BadgeCheck, CircleCheck, FileCheck2, PenLine, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 const REQUIREMENTS = [
@@ -13,6 +13,12 @@ const REQUIREMENTS = [
     title: "RUT actualizado como postor",
     description:
       "Tu RUT debe estar vigente y actualizado en calidad de postor antes de la fecha del remate.",
+  },
+  {
+    icon: PenLine,
+    title: "Firma electrónica actualizada",
+    description:
+      "Debes tener tu firma electrónica vigente y actualizada para poder participar en el remate.",
   },
 ] as const;
 
@@ -34,13 +40,16 @@ export function DianRequirements({ action }: { action: ReactNode }) {
           Requisitos para participar (remate DIAN)
         </h2>
         <p className="text-sm text-muted">
-          Los remates de la DIAN exigen cumplir estos dos requisitos como postor.
+          Los remates de la DIAN exigen cumplir estos requisitos como postor.
         </p>
       </div>
 
       <ul className="grid gap-3 sm:grid-cols-2">
         {REQUIREMENTS.map(({ icon: Icon, title, description }) => (
-          <li key={title} className="flex gap-3 rounded-xl border border-border bg-background p-4">
+          <li
+            key={title}
+            className="flex gap-3 rounded-xl border border-border bg-background p-4 sm:last:odd:col-span-2"
+          >
             <Icon className="mt-0.5 size-5 shrink-0" aria-hidden />
             <div className="flex flex-col gap-1">
               <h3 className="text-sm font-medium">{title}</h3>
@@ -63,6 +72,14 @@ export function DianRequirements({ action }: { action: ReactNode }) {
         </div>
         <div className="shrink-0">{action}</div>
       </div>
+
+      <p className="flex items-start gap-2 text-sm">
+        <CircleCheck className="mt-0.5 size-4 shrink-0" aria-hidden />
+        <span>
+          <strong className="font-medium">El servicio incluye la actualización del RUT</strong> como
+          postor: no tienes que hacer ese trámite por tu cuenta.
+        </span>
+      </p>
     </section>
   );
 }
