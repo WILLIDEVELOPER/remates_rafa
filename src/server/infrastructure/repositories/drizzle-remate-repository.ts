@@ -21,6 +21,7 @@ import type {
   RemateChanges,
 } from "../../domain/entities/remate.ts";
 import { ESTADOS_REMATE } from "../../domain/entities/remate.ts";
+import { PRIOR_MEAN, PRIOR_WEIGHT } from "../../domain/rules/rating-rules.ts";
 import { SlugAlreadyExistsError } from "../../domain/errors/slug-already-exists-error.ts";
 import type {
   DepartamentoCount,
@@ -33,6 +34,7 @@ import type {
   RemateStats,
 } from "../../domain/repositories/remate-repository.ts";
 import type { db } from "../db/client.ts";
+import { isUniqueViolation } from "../db/errors.ts";
 import { remates, type RemateRow } from "../db/schema.ts";
 
 type Database = typeof db;
@@ -42,28 +44,21 @@ type RemateColumns = Omit<RemateRow, "searchVector">;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const { searchVector: _searchVector, ...columns } = getTableColumns(remates);
 
-const UNIQUE_VIOLATION = "23505";
-
-function isUniqueViolation(error: unknown): boolean {
-  let current: unknown = error;
-  for (let depth = 0; depth < 3 && current; depth++) {
-    if ((current as { code?: string }).code === UNIQUE_VIOLATION) return true;
-    current = (current as { cause?: unknown }).cause;
-  }
-  return false;
-}
-
 function escapeLike(value: string): string {
   return value.replace(/[\\%_]/g, "\\$&");
 }
+
+const toNumberOrNull = (value: string | null) => (value === null ? null : Number(value));
+const toStringOrNull = (value: number | null) => (value === null ? null : String(value));
 
 function toEntity(row: RemateColumns): Remate {
   return {
     ...row,
     precioBase: Number(row.precioBase),
-    precioComercial:
-      row.precioComercial === null ? null : Number(row.precioComercial),
-    area: Number(row.area),
+    precioComercial: toNumberOrNull(row.precioComercial),
+    precioDerecho: toNumberOrNull(row.precioDerecho),
+    area: toNumberOrNull(row.area),
+    calificacionPromedio: toNumberOrNull(row.calificacionPromedio),
   };
 }
 
@@ -71,23 +66,27 @@ function toInsertValues(data: NewRemate) {
   return {
     ...data,
     precioBase: String(data.precioBase),
-    precioComercial:
-      data.precioComercial === null ? null : String(data.precioComercial),
-    area: String(data.area),
+    precioComercial: toStringOrNull(data.precioComercial),
+    precioDerecho: toStringOrNull(data.precioDerecho),
+    area: toStringOrNull(data.area),
   };
 }
 
 function toUpdateValues(changes: RemateChanges) {
-  const { precioBase, precioComercial, area, ...rest } = changes;
+  const { precioBase, precioComercial, precioDerecho, area, ...rest } = changes;
   return {
     ...rest,
     ...(precioBase !== undefined && { precioBase: String(precioBase) }),
-    ...(precioComercial !== undefined && {
-      precioComercial: precioComercial === null ? null : String(precioComercial),
-    }),
-    ...(area !== undefined && { area: String(area) }),
+    ...(precioComercial !== undefined && { precioComercial: toStringOrNull(precioComercial) }),
+    ...(precioDerecho !== undefined && { precioDerecho: toStringOrNull(precioDerecho) }),
+    ...(area !== undefined && { area: toStringOrNull(area) }),
   };
 }
+
+// Mismo cálculo que `rankingScore` del dominio, pero en SQL para ordenar en la base de datos.
+const rankingScoreSql = sql`(
+  coalesce(${remates.calificacionPromedio}, 0) * ${remates.calificacionesCount} + ${PRIOR_MEAN * PRIOR_WEIGHT}
+) / (${remates.calificacionesCount} + ${PRIOR_WEIGHT})`
 
 // Búsqueda aproximada (pg_trgm): tolera errores de tipeo, letras de más o de
 // menos y tildes. 0 = nada en común, 1 = coincidencia exacta.
@@ -123,6 +122,9 @@ function buildWhere(filters: RemateFilters): SQL | undefined {
   if (filters.tipos?.length) {
     conditions.push(inArray(remates.tipoInmueble, filters.tipos));
   }
+  if (filters.tiposRemate?.length) {
+    conditions.push(inArray(remates.tipoRemate, filters.tiposRemate));
+  }
   if (filters.estados?.length) {
     conditions.push(inArray(remates.estado, filters.estados));
   }
@@ -156,6 +158,8 @@ function buildOrderBy(sort: RemateSort, search?: string): SQL[] {
       return [desc(remates.precioBase), ...tieBreak];
     case "fecha_remate":
       return [sql`${remates.fechaRemate} asc nulls last`, ...tieBreak];
+    case "mejor_calificados":
+      return [desc(rankingScoreSql), desc(remates.calificacionesCount), ...tieBreak];
     default:
       return tieBreak;
   }

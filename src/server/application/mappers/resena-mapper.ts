@@ -6,6 +6,7 @@ export function toPublicResenaDto(resena: Resena): PublicResenaDto {
     id: resena.id,
     nombre: resena.nombre,
     comentario: resena.comentario,
+    calificacion: resena.calificacion,
     createdAt: resena.createdAt.toISOString(),
   };
 }

@@ -47,6 +47,11 @@ function RequestCard({ request }: { request: ContactRequestDto }) {
                 Nueva
               </Chip>
             ) : null}
+            {request.servicio === "gestion_rut" ? (
+              <Chip size="sm" color="warning" variant="soft" className="rounded-full">
+                Gestión del RUT
+              </Chip>
+            ) : null}
           </div>
           <p className="text-xs text-muted">{formatDate(request.createdAt)}</p>
         </div>

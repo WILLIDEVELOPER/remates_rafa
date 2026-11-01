@@ -1,15 +1,19 @@
 import type { RemateRepository } from "../../domain/repositories/remate-repository.ts";
+import type { ResenaRepository } from "../../domain/repositories/resena-repository.ts";
 import type { ListRematesInput, ListRematesOutput } from "../dtos/remate-dto.ts";
 import { toRemateDto } from "../mappers/remate-mapper.ts";
+import { loadBestResenas } from "./best-resenas.ts";
 
 const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 48;
 
 export class ListRemates {
   private readonly remates: RemateRepository;
+  private readonly resenas?: ResenaRepository;
 
-  constructor(remates: RemateRepository) {
+  constructor(remates: RemateRepository, resenas?: ResenaRepository) {
     this.remates = remates;
+    this.resenas = resenas;
   }
 
   async execute(input: ListRematesInput = {}): Promise<ListRematesOutput> {
@@ -31,6 +35,7 @@ export class ListRemates {
         ciudad: input.ciudad,
         municipio: input.municipio,
         tipos: input.tipos,
+        tiposRemate: input.tiposRemate,
         estados: input.estados,
         precioMin,
         precioMax,
@@ -42,8 +47,15 @@ export class ListRemates {
       pageSize,
     });
 
+    const mejores = input.conMejorResena
+      ? await loadBestResenas(
+          this.resenas,
+          items.map((remate) => remate.id),
+        )
+      : new Map();
+
     return {
-      items: items.map(toRemateDto),
+      items: items.map((remate) => toRemateDto(remate, mejores.get(remate.id) ?? null)),
       total,
       page,
       pageSize,

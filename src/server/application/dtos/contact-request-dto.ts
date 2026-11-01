@@ -1,8 +1,11 @@
+import type { ServicioSolicitado } from "../../domain/entities/contact-request.ts";
+
 export interface CreateContactRequestInput {
   nombre: string;
   email: string;
   telefono?: string | null;
   mensaje: string;
+  servicio?: ServicioSolicitado;
   remateId?: string | null;
 }
 
@@ -12,6 +15,7 @@ export interface ContactRequestDto {
   email: string;
   telefono: string | null;
   mensaje: string;
+  servicio: ServicioSolicitado;
   remateId: string | null;
   remateNombre: string | null;
   remateSlug: string | null;

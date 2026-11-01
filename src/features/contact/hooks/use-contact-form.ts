@@ -7,10 +7,12 @@ import {
   contactFormSchema,
   type ContactFormValues,
 } from "../schemas/contact-schema";
+import type { ServicioSolicitado } from "@/server/domain/entities/contact-request";
 import { sendContactRequest } from "../services/contact-service";
 
 interface UseContactFormOptions {
   remateId?: string;
+  servicio?: ServicioSolicitado;
   defaultMessage?: string;
   onSuccess?: () => void;
 }
@@ -19,6 +21,7 @@ const FIELDS = ["nombre", "email", "telefono", "mensaje"] as const;
 
 export function useContactForm({
   remateId,
+  servicio,
   defaultMessage = "",
   onSuccess,
 }: UseContactFormOptions = {}) {
@@ -34,7 +37,7 @@ export function useContactForm({
   });
 
   const onSubmit = form.handleSubmit(async (values) => {
-    const result = await sendContactRequest(values, remateId);
+    const result = await sendContactRequest(values, remateId, servicio);
 
     if (result.ok) {
       toast.success("Mensaje enviado", {

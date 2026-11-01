@@ -4,6 +4,7 @@ import {
   RESENA_COMENTARIO_MIN,
 } from "../../domain/entities/resena.ts";
 import { checkEmail, checkPhone } from "../../domain/rules/contact-rules.ts";
+import { CALIFICACION_MAX, CALIFICACION_MIN } from "../../domain/rules/rating-rules.ts";
 import { checkComentario, checkNombre } from "../../domain/rules/content-rules.ts";
 import { checkedField } from "./checked-field.ts";
 
@@ -19,6 +20,11 @@ export const remateResenasIdSchema = z.uuid("Identificador de remate inválido."
 
 export const createResenaSchema = z.object({
   remateId: remateResenasIdSchema,
+  calificacion: z
+    .number("Elige una calificación.")
+    .int("La calificación debe ser un número entero.")
+    .min(CALIFICACION_MIN, "Elige al menos una estrella.")
+    .max(CALIFICACION_MAX, `La calificación máxima es ${CALIFICACION_MAX} estrellas.`),
   nombre: checkedField(checkNombre, 200),
   email: checkedField(checkEmail, 300),
   telefono: checkedField(checkPhone, 60),

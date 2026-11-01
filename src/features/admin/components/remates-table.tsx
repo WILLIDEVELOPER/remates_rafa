@@ -23,6 +23,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useOptimistic, useState, useTransition } from "react";
 import { EstadoChip } from "@/components/ui/estado-chip";
+import { RatingSummary } from "@/components/ui/star-rating";
+import { TipoRemateChip } from "@/components/ui/tipo-remate-chip";
 import { formatCOP, formatDate, formatLocation } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { RemateDto } from "@/server/application/dtos/remate-dto";
@@ -130,6 +132,7 @@ export function RematesTable({ remates }: { remates: RemateDto[] }) {
                           {remate.nombre}
                         </Link>
                         <span className="max-w-64 truncate text-xs text-muted">/{remate.slug}</span>
+                        <RatingSummary promedio={remate.calificacionPromedio} count={remate.calificacionesCount} />
                       </div>
                     </div>
                   </Table.Cell>
@@ -145,7 +148,8 @@ export function RematesTable({ remates }: { remates: RemateDto[] }) {
                     <span className="text-sm font-medium whitespace-nowrap">{formatCOP(remate.precioBase)}</span>
                   </Table.Cell>
                   <Table.Cell>
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <TipoRemateChip tipo={remate.tipoRemate} />
                       <EstadoChip estado={remate.estado} />
                       {!remate.activo ? (
                         <Chip size="sm" variant="secondary" className="rounded-full">

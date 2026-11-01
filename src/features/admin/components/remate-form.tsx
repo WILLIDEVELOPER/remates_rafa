@@ -1,7 +1,7 @@
 "use client";
 
 import { Accordion, Alert, Button, Label, Spinner, Switch } from "@heroui/react";
-import { ChevronDown } from "lucide-react";
+import { Calculator, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { Controller, useWatch } from "react-hook-form";
 import {
@@ -10,6 +10,7 @@ import {
   getCiudades,
   getMunicipios,
   TIPOS_INMUEBLE_OPTIONS,
+  TIPOS_REMATE_OPTIONS,
 } from "@/lib/colombia";
 import { slugify } from "@/lib/slug";
 import type { RemateDto } from "@/server/application/dtos/remate-dto";
@@ -61,6 +62,14 @@ export function RemateForm({ remate }: { remate?: RemateDto }) {
   const departamento = useWatch({ control, name: "departamento" });
   const ciudad = useWatch({ control, name: "ciudad" });
   const municipio = useWatch({ control, name: "municipio" });
+  const precioComercial = useWatch({ control, name: "precioComercial" });
+
+  // El 70 % (base) y el 40 % (derecho a participar) se calculan sobre el valor comercial.
+  const calcularDesdeComercial = () => {
+    if (!precioComercial) return;
+    setValue("precioBase", Math.round(precioComercial * 0.7), { shouldValidate: true });
+    setValue("precioDerecho", Math.round(precioComercial * 0.4), { shouldValidate: true });
+  };
 
   // Solo hay datos de referencia para algunos departamentos; en el resto se escribe a mano.
   const ciudades = withCurrent(getCiudades(departamento), ciudad);
@@ -115,6 +124,7 @@ export function RemateForm({ remate }: { remate?: RemateDto }) {
             <div className="md:col-span-2">
               <FormTextArea control={control} name="descripcion" label="Descripción" placeholder="Describe el inmueble, su estado jurídico y sus ventajas." />
             </div>
+            <FormSelect control={control} name="tipoRemate" label="Tipo de remate" placeholder="Rama Judicial o DIAN" options={TIPOS_REMATE_OPTIONS} required />
             <FormSelect control={control} name="tipoInmueble" label="Tipo de inmueble" placeholder="Selecciona un tipo" options={TIPOS_INMUEBLE_OPTIONS} required />
             <FormSelect control={control} name="estado" label="Estado" placeholder="Selecciona un estado" options={ESTADOS_REMATE_OPTIONS} required />
             <FormText control={control} name="fechaRemate" label="Fecha y hora del remate (hora de Colombia)" type="datetime-local" />
@@ -184,9 +194,26 @@ export function RemateForm({ remate }: { remate?: RemateDto }) {
 
         <Section id="precio" title="Precio y características" description="Valores en pesos colombianos (COP) y medidas del inmueble.">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <FormNumber control={control} name="precioBase" label="Precio base (COP)" placeholder="$ 500.000.000" currency required />
             <FormNumber control={control} name="precioComercial" label="Precio comercial (COP, opcional)" placeholder="$ 750.000.000" currency />
-            <FormNumber control={control} name="area" label="Área (m²)" placeholder="120" required />
+            <FormNumber control={control} name="precioBase" label="Precio base — 70 % (COP)" placeholder="$ 525.000.000" currency required />
+            <FormNumber control={control} name="precioDerecho" label="Precio del 40 % — derecho a participar (COP, opcional)" placeholder="$ 300.000.000" currency />
+            <div className="flex items-center gap-3 md:col-span-2 lg:col-span-3">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                isDisabled={!precioComercial}
+                onPress={calcularDesdeComercial}
+                className="rounded-full"
+              >
+                <Calculator className="size-3.5" />
+                Calcular 70 % y 40 % desde el precio comercial
+              </Button>
+              <p className="text-xs text-muted">
+                El precio base (70 %) es desde donde parte el remate; el del 40 % es el derecho a participar. Puedes ajustarlos a mano.
+              </p>
+            </div>
+            <FormNumber control={control} name="area" label="Área (m², opcional)" placeholder="120" />
             <FormNumber control={control} name="habitaciones" label="Habitaciones (opcional)" placeholder="3" maxValue={100} />
             <FormNumber control={control} name="banos" label="Baños (opcional)" placeholder="2" maxValue={100} />
           </div>

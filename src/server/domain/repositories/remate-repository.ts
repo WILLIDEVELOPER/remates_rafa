@@ -4,13 +4,16 @@ import type {
   Remate,
   RemateChanges,
   TipoInmueble,
+  TipoRemate,
 } from "../entities/remate.ts";
 
 export type RemateSort =
   | "recientes"
   | "precio_asc"
   | "precio_desc"
-  | "fecha_remate";
+  | "fecha_remate"
+  /** Puntaje bayesiano de las calificaciones (ver `rankingScore`), de mayor a menor. */
+  | "mejor_calificados";
 
 export interface RemateFilters {
   search?: string;
@@ -18,6 +21,8 @@ export interface RemateFilters {
   ciudad?: string;
   municipio?: string;
   tipos?: TipoInmueble[];
+  /** Rama Judicial, DIAN o ambos (sin valor = todos). */
+  tiposRemate?: TipoRemate[];
   estados?: EstadoRemate[];
   precioMin?: number;
   precioMax?: number;

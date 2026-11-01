@@ -6,16 +6,20 @@ import { Suspense } from "react";
 import { WhatsappInlineButton } from "@/components/layout/whatsapp-button";
 import { EstadoChip } from "@/components/ui/estado-chip";
 import { RemateGridSkeleton } from "@/components/ui/remate-card-skeleton";
-import { InquiryDialog } from "@/features/contact";
+import { RemateDetailPrices } from "@/components/ui/remate-prices";
+import { RatingSummary } from "@/components/ui/star-rating";
+import { TipoRemateChip } from "@/components/ui/tipo-remate-chip";
+import { InquiryDialog, RutServiceDialog } from "@/features/contact";
 import {
+  DianRequirements,
   RelatedRemates,
   RemateGallery,
   RemateLocation,
   RemateSpecs,
 } from "@/features/remates";
 import { RemateReviews } from "@/features/reviews";
-import { discountPercent, formatCOP, formatDate, formatLocation } from "@/lib/format";
-import { TIPO_LABELS } from "@/lib/remate-labels";
+import { formatCOP, formatDate, formatLocation } from "@/lib/format";
+import { TIPO_LABELS, TIPO_REMATE_LABELS } from "@/lib/remate-labels";
 import { getBaseUrl, SITE } from "@/lib/site";
 import { getRemateBySlugAction } from "@/server/presentation/actions/remate-actions";
 
@@ -37,7 +41,7 @@ export async function generateMetadata({
   if (!result.ok) return { title: "Remate no encontrado" };
 
   const remate = result.data;
-  const description = `${TIPO_LABELS[remate.tipoInmueble]} en ${remate.municipio}, ${remate.departamento}. Precio base ${formatCOP(remate.precioBase)}. ${remate.descripcion}`.slice(0, 200);
+  const description = `Remate ${TIPO_REMATE_LABELS[remate.tipoRemate]}: ${TIPO_LABELS[remate.tipoInmueble]} en ${remate.municipio}, ${remate.departamento}. Precio base (70 %) ${formatCOP(remate.precioBase)}. ${remate.descripcion}`.slice(0, 200);
 
   return {
     title: remate.nombre,
@@ -61,7 +65,6 @@ const AVAILABILITY = {
 export default async function RemateDetailPage({ params }: PageProps<"/remates/[slug]">) {
   const { slug } = await params;
   const remate = await loadRemate(slug);
-  const discount = discountPercent(remate.precioBase, remate.precioComercial);
 
   const baseUrl = getBaseUrl().replace(/\/$/, "");
   const absolute = (url: string) => (url.startsWith("/") ? `${baseUrl}${url}` : url);
@@ -106,12 +109,14 @@ export default async function RemateDetailPage({ params }: PageProps<"/remates/[
 
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
+            <TipoRemateChip tipo={remate.tipoRemate} size="md" />
             <EstadoChip estado={remate.estado} size="md" />
             <span className="text-xs font-medium tracking-wide text-muted uppercase">
               {TIPO_LABELS[remate.tipoInmueble]}
             </span>
           </div>
           <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">{remate.nombre}</h1>
+          <RatingSummary promedio={remate.calificacionPromedio} count={remate.calificacionesCount} size="md" />
           <p className="flex items-center gap-1.5 text-muted">
             <MapPin className="size-4 shrink-0" />
             {formatLocation([remate.municipio, remate.ciudad, remate.departamento])}
@@ -123,6 +128,11 @@ export default async function RemateDetailPage({ params }: PageProps<"/remates/[
         <div className="flex min-w-0 flex-col gap-12">
           <RemateGallery images={remate.imagenUrls} nombre={remate.nombre} />
           <RemateSpecs remate={remate} />
+          {remate.tipoRemate === "dian" ? (
+            <DianRequirements
+              action={<RutServiceDialog remateId={remate.id} remateNombre={remate.nombre} />}
+            />
+          ) : null}
           <section aria-labelledby="descripcion" className="flex flex-col gap-4">
             <h2 id="descripcion" className="text-xl font-medium tracking-tight">
               Descripción
@@ -131,25 +141,18 @@ export default async function RemateDetailPage({ params }: PageProps<"/remates/[
           </section>
           <RemateLocation remate={remate} />
           <Suspense fallback={<div className="h-40 animate-pulse rounded-2xl bg-surface-secondary" />}>
-            <RemateReviews remateId={remate.id} remateNombre={remate.nombre} />
+            <RemateReviews
+              remateId={remate.id}
+              remateNombre={remate.nombre}
+              calificacionPromedio={remate.calificacionPromedio}
+              calificacionesCount={remate.calificacionesCount}
+            />
           </Suspense>
         </div>
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <div className="flex flex-col gap-5 rounded-2xl border border-border p-6">
-            <div className="flex flex-col gap-1">
-              <span className="text-sm text-muted">Precio base</span>
-              <span className="text-3xl font-semibold tracking-tight">
-                {formatCOP(remate.precioBase)}
-              </span>
-              {remate.precioComercial ? (
-                <span className="text-sm text-muted">
-                  Comercial{" "}
-                  <span className="line-through">{formatCOP(remate.precioComercial)}</span>
-                  {discount ? ` · ${discount} % menos` : ""}
-                </span>
-              ) : null}
-            </div>
+            <RemateDetailPrices remate={remate} />
 
             <div className="flex flex-col gap-1 border-t border-border pt-4 text-sm">
               <span className="text-muted">Fecha del remate</span>

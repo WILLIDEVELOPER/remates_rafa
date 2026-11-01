@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ESTADO_VALUES, TIPO_VALUES } from "@/lib/remate-labels";
+import { ESTADO_VALUES, TIPO_REMATE_VALUES, TIPO_VALUES } from "@/lib/remate-labels";
 
 export const MAX_IMAGES = 30;
 export const MAX_IMAGE_MB = 5;
@@ -35,6 +35,7 @@ export const remateFormSchema = z.object({
     .min(20, "La descripción debe tener al menos 20 caracteres.")
     .max(10_000, "La descripción es demasiado larga."),
   tipoInmueble: z.enum(TIPO_VALUES, "Selecciona un tipo de inmueble."),
+  tipoRemate: z.enum(TIPO_REMATE_VALUES, "Selecciona Rama Judicial o DIAN."),
   estado: z.enum(ESTADO_VALUES, "Selecciona un estado."),
   destacado: z.boolean(),
   /** Hora local de Colombia, formato `YYYY-MM-DDTHH:mm`. */
@@ -52,16 +53,25 @@ export const remateFormSchema = z.object({
     .positive("El precio comercial debe ser mayor a cero.")
     .max(MAX_PRECIO, "El precio comercial es demasiado alto.")
     .optional(),
+  precioDerecho: z
+    .number({ error: "Ingresa un precio del 40 % válido." })
+    .positive("El precio del 40 % debe ser mayor a cero.")
+    .max(MAX_PRECIO, "El precio del 40 % es demasiado alto.")
+    .optional(),
   area: z
     .number({ error: "Ingresa un área válida." })
     .positive("El área debe ser mayor a cero.")
-    .max(99_999_999, "El área es demasiado grande."),
+    .max(99_999_999, "El área es demasiado grande.")
+    .optional(),
   habitaciones: optionalInt("Las habitaciones"),
   banos: optionalInt("Los baños"),
   imagenes: z
     .array(z.string())
     .min(1, "Sube al menos una imagen.")
     .max(MAX_IMAGES, `Máximo ${MAX_IMAGES} imágenes.`),
+}).refine((values) => values.precioDerecho === undefined || values.precioDerecho < values.precioBase, {
+  path: ["precioDerecho"],
+  message: "El precio del 40 % debe ser menor al precio base del 70 %.",
 });
 
 export type RemateFormValues = z.infer<typeof remateFormSchema>;

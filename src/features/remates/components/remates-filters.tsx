@@ -8,6 +8,7 @@ import {
   getMunicipios,
   DEPARTAMENTOS,
   TIPOS_INMUEBLE_OPTIONS,
+  TIPOS_REMATE_OPTIONS,
 } from "../constants";
 import { useRemateFilters } from "../hooks/use-remate-filters";
 import {
@@ -21,6 +22,7 @@ const SORT_OPTIONS = [
   { value: "precio_asc", label: "Precio: menor a mayor" },
   { value: "precio_desc", label: "Precio: mayor a menor" },
   { value: "fecha_remate", label: "Fecha de remate" },
+  { value: "mejor_calificados", label: "Mejor calificados" },
 ] as const;
 
 const toOptions = (items: readonly string[]) =>
@@ -67,6 +69,13 @@ function FilterFields({
         />
       </div>
 
+      <FilterSelect
+        label="Tipo de remate"
+        placeholder="Todos (Rama Judicial y DIAN)"
+        value={values.entidad}
+        options={TIPOS_REMATE_OPTIONS}
+        onChange={(entidad) => update({ entidad })}
+      />
       <FilterSelect
         label="Departamento"
         placeholder="Todos los departamentos"

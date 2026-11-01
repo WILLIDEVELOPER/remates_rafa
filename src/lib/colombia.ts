@@ -1,8 +1,10 @@
 import {
   ESTADO_LABELS,
   TIPO_LABELS,
+  TIPO_REMATE_LABELS,
   type EstadoRemateKey,
   type TipoInmuebleKey,
+  type TipoRemateKey,
 } from "./remate-labels";
 
 export const DEPARTAMENTOS = [
@@ -116,6 +118,10 @@ export const UBICACIONES: Record<string, Record<string, string[]>> = {
 
 export const TIPOS_INMUEBLE_OPTIONS = (
   Object.entries(TIPO_LABELS) as [TipoInmuebleKey, string][]
+).map(([value, label]) => ({ value, label }));
+
+export const TIPOS_REMATE_OPTIONS = (
+  Object.entries(TIPO_REMATE_LABELS) as [TipoRemateKey, string][]
 ).map(([value, label]) => ({ value, label }));
 
 export const ESTADOS_REMATE_OPTIONS = (

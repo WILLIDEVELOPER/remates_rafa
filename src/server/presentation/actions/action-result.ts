@@ -7,6 +7,7 @@ export type ActionErrorCode =
   | "CONFLICT"
   | "INVALID"
   | "UNAUTHORIZED"
+  | "RATE_LIMITED"
   | "UNKNOWN";
 
 export interface ActionError {

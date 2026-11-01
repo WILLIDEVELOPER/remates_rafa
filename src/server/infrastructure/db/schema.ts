@@ -1,6 +1,7 @@
 import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   customType,
   index,
   integer,
@@ -8,15 +9,18 @@ import {
   numeric,
   pgEnum,
   pgTable,
+  smallint,
   text,
   timestamp,
   uniqueIndex,
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
+import { SERVICIOS_SOLICITADOS } from "../../domain/entities/contact-request.ts";
 import {
   ESTADOS_REMATE,
   TIPOS_INMUEBLE,
+  TIPOS_REMATE,
 } from "../../domain/entities/remate.ts";
 import { USER_ROLES } from "../../domain/entities/user.ts";
 
@@ -26,6 +30,8 @@ const tsvector = customType<{ data: string }>({
 
 export const tipoInmuebleEnum = pgEnum("tipo_inmueble", TIPOS_INMUEBLE);
 export const estadoRemateEnum = pgEnum("estado_remate", ESTADOS_REMATE);
+export const tipoRemateEnum = pgEnum("tipo_remate", TIPOS_REMATE);
+export const servicioSolicitadoEnum = pgEnum("servicio_solicitado", SERVICIOS_SOLICITADOS);
 export const userRoleEnum = pgEnum("user_role", USER_ROLES);
 
 // Better Auth (usePlural: true): users, sessions, accounts, verifications
@@ -116,9 +122,11 @@ export const remates = pgTable(
     municipio: varchar("municipio", { length: 120 }).notNull(),
     direccion: varchar("direccion", { length: 255 }),
     tipoInmueble: tipoInmuebleEnum("tipo_inmueble").notNull(),
+    tipoRemate: tipoRemateEnum("tipo_remate").notNull().default("rama_judicial"),
     precioBase: numeric("precio_base", { precision: 14, scale: 2 }).notNull(),
     precioComercial: numeric("precio_comercial", { precision: 14, scale: 2 }),
-    area: numeric("area", { precision: 10, scale: 2 }).notNull(),
+    precioDerecho: numeric("precio_derecho", { precision: 14, scale: 2 }),
+    area: numeric("area", { precision: 10, scale: 2 }),
     habitaciones: integer("habitaciones"),
     banos: integer("banos"),
     estado: estadoRemateEnum("estado").notNull().default("disponible"),
@@ -135,6 +143,9 @@ export const remates = pgTable(
     createdBy: uuid("created_by").references(() => users.id, {
       onDelete: "set null",
     }),
+    // Derivados de `resenas`: los recalcula el repositorio de reseñas en cada alta o baja.
+    calificacionPromedio: numeric("calificacion_promedio", { precision: 3, scale: 2 }),
+    calificacionesCount: integer("calificaciones_count").notNull().default(0),
     searchVector: tsvector("search_vector").generatedAlwaysAs(
       sql`to_tsvector('spanish', coalesce(nombre, '') || ' ' || coalesce(descripcion, ''))`,
     ),
@@ -145,6 +156,7 @@ export const remates = pgTable(
     index("remates_estado_activo_idx").on(t.estado, t.activo),
     index("remates_precio_base_idx").on(t.precioBase),
     index("remates_destacado_activo_idx").on(t.destacado, t.activo),
+    index("remates_tipo_remate_idx").on(t.tipoRemate),
     index("remates_search_idx").using("gin", t.searchVector),
   ],
 );
@@ -163,9 +175,20 @@ export const resenas = pgTable(
     email: varchar("email", { length: 255 }).notNull(),
     telefono: varchar("telefono", { length: 30 }).notNull(),
     comentario: text("comentario").notNull(),
+    // Nulo solo en las reseñas anteriores a las calificaciones.
+    calificacion: smallint("calificacion"),
+    // Antiabuso (nulos en reseñas anteriores): el correo sin alias y la IP como HMAC, nunca en claro.
+    emailClave: varchar("email_clave", { length: 255 }),
+    ipHash: varchar("ip_hash", { length: 64 }),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [index("resenas_remate_created_idx").on(t.remateId, t.createdAt)],
+  (t) => [
+    index("resenas_remate_created_idx").on(t.remateId, t.createdAt),
+    // Una reseña por persona y remate; los nulos (reseñas anteriores) no chocan entre sí.
+    uniqueIndex("resenas_remate_email_clave_uidx").on(t.remateId, t.emailClave),
+    index("resenas_ip_created_idx").on(t.ipHash, t.createdAt),
+    check("resenas_calificacion_rango", sql`${t.calificacion} between 1 and 5`),
+  ],
 );
 
 export const solicitudesContacto = pgTable(
@@ -176,6 +199,7 @@ export const solicitudesContacto = pgTable(
     email: varchar("email", { length: 255 }).notNull(),
     telefono: varchar("telefono", { length: 30 }),
     mensaje: text("mensaje").notNull(),
+    servicio: servicioSolicitadoEnum("servicio").notNull().default("informacion"),
     remateId: uuid("remate_id").references(() => remates.id, {
       onDelete: "set null",
     }),

@@ -12,9 +12,15 @@ interface UseReviewFormOptions {
   onSuccess?: () => void;
 }
 
-const EMPTY: ReviewFormValues = { nombre: "", email: "", telefono: "", comentario: "", website: "" };
+const EMPTY: Partial<ReviewFormValues> = {
+  nombre: "",
+  email: "",
+  telefono: "",
+  comentario: "",
+  website: "",
+};
 const CONTACT_FIELDS = ["nombre", "email", "telefono"] as const;
-const FIELDS = [...CONTACT_FIELDS, "comentario"] as const;
+const FIELDS = [...CONTACT_FIELDS, "calificacion", "comentario"] as const;
 
 /** Formulario en dos pasos: primero los datos de contacto, después la reseña. */
 export function useReviewForm({ remateId, onSuccess }: UseReviewFormOptions) {
@@ -27,6 +33,9 @@ export function useReviewForm({ remateId, onSuccess }: UseReviewFormOptions) {
   const goToReview = async () => {
     if (await form.trigger(CONTACT_FIELDS)) setStep(2);
   };
+
+  // Un envío rechazado por el servidor puede señalar cualquier campo; se vuelve al paso que lo contiene.
+  const stepOf = (field: (typeof FIELDS)[number]) => (field === "comentario" || field === "calificacion" ? 2 : 1);
 
   const submit = form.handleSubmit(async (values) => {
     const result = await sendReview(values, remateId);
@@ -45,7 +54,8 @@ export function useReviewForm({ remateId, onSuccess }: UseReviewFormOptions) {
       const message = result.error.fieldErrors?.[field]?.[0];
       if (message) form.setError(field, { message });
     }
-    if (CONTACT_FIELDS.some((field) => result.error.fieldErrors?.[field])) setStep(1);
+    const failing = FIELDS.filter((field) => result.error.fieldErrors?.[field]);
+    if (failing.length > 0) setStep(failing.some((field) => stepOf(field) === 1) ? 1 : 2);
 
     toast.danger("No pudimos publicar tu reseña", { description: result.error.message });
   });

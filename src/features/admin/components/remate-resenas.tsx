@@ -4,6 +4,7 @@ import { Button, Card } from "@heroui/react";
 import { Mail, MessageSquareQuote, Pencil, Phone, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { EmptyState } from "@/components/ui/empty-state";
+import { StarRating } from "@/components/ui/star-rating";
 import { formatDateTime } from "@/lib/format";
 import type { AdminResenaDto } from "@/server/application/dtos/resena-dto";
 import { DeleteResenaDialog } from "./delete-resena-dialog";
@@ -39,6 +40,11 @@ export function RemateResenas({ resenas }: { resenas: AdminResenaDto[] }) {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="flex flex-col gap-1">
                     <h3 className="text-base font-medium tracking-tight">{resena.nombre}</h3>
+                    {resena.calificacion ? (
+                      <StarRating value={resena.calificacion} size="sm" />
+                    ) : (
+                      <p className="text-xs text-muted">Sin calificación (reseña anterior)</p>
+                    )}
                     <p className="text-xs text-muted">{formatDateTime(resena.createdAt)}</p>
                   </div>
                   <div className="flex gap-2">

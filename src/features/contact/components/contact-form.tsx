@@ -10,11 +10,13 @@ import {
   TextField,
 } from "@heroui/react";
 import { Controller, type Control } from "react-hook-form";
+import type { ServicioSolicitado } from "@/server/domain/entities/contact-request";
 import { useContactForm } from "../hooks/use-contact-form";
 import type { ContactFormValues } from "../schemas/contact-schema";
 
 interface ContactFormProps {
   remateId?: string;
+  servicio?: ServicioSolicitado;
   defaultMessage?: string;
   onSuccess?: () => void;
 }
@@ -62,8 +64,8 @@ function Field({
   );
 }
 
-export function ContactForm({ remateId, defaultMessage, onSuccess }: ContactFormProps) {
-  const { form, onSubmit } = useContactForm({ remateId, defaultMessage, onSuccess });
+export function ContactForm({ remateId, servicio, defaultMessage, onSuccess }: ContactFormProps) {
+  const { form, onSubmit } = useContactForm({ remateId, servicio, defaultMessage, onSuccess });
   const { control, register, formState } = form;
 
   return (

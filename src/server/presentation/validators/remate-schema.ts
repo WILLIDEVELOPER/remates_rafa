@@ -4,6 +4,7 @@ import {
   MAX_IMAGENES,
   MIN_IMAGENES,
   TIPOS_INMUEBLE,
+  TIPOS_REMATE,
   isUploadedImageKey,
 } from "../../domain/entities/remate.ts";
 import type { ListRematesInput } from "../../application/dtos/remate-dto.ts";
@@ -48,10 +49,16 @@ export const remateFormSchema = z.object({
     .max(255, "La dirección no puede superar 255 caracteres.")
     .nullish(),
   tipoInmueble: z.enum(TIPOS_INMUEBLE, "Selecciona un tipo de inmueble."),
+  tipoRemate: z.enum(TIPOS_REMATE, "Selecciona Rama Judicial o DIAN.").optional(),
   precioBase: z
     .number("Ingresa un precio base válido.")
     .positive("El precio base debe ser mayor a cero.")
     .max(MAX_PRECIO, "El precio base es demasiado alto."),
+  precioDerecho: z
+    .number("Ingresa un precio del 40 % válido.")
+    .positive("El precio del 40 % debe ser mayor a cero.")
+    .max(MAX_PRECIO, "El precio del 40 % es demasiado alto.")
+    .nullish(),
   precioComercial: z
     .number("Ingresa un precio comercial válido.")
     .positive("El precio comercial debe ser mayor a cero.")
@@ -60,7 +67,8 @@ export const remateFormSchema = z.object({
   area: z
     .number("Ingresa un área válida.")
     .positive("El área debe ser mayor a cero.")
-    .max(MAX_AREA, "El área es demasiado grande."),
+    .max(MAX_AREA, "El área es demasiado grande.")
+    .nullish(),
   habitaciones: z.number().int("Debe ser un entero.").min(0).max(100).nullish(),
   banos: z.number().int("Debe ser un entero.").min(0).max(100).nullish(),
   estado: z.enum(ESTADOS_REMATE).optional(),
@@ -152,6 +160,7 @@ export const listRematesParamsSchema = z
     ciudad: optionalText,
     municipio: optionalText,
     tipo: csvEnum(TIPOS_INMUEBLE),
+    entidad: csvEnum(TIPOS_REMATE),
     estado: csvEnum(ESTADOS_REMATE),
     min: optionalNumber(MAX_PRECIO),
     max: optionalNumber(MAX_PRECIO),
@@ -159,7 +168,7 @@ export const listRematesParamsSchema = z
       .preprocess(
         firstValue,
         z
-          .enum(["recientes", "precio_asc", "precio_desc", "fecha_remate"])
+          .enum(["recientes", "precio_asc", "precio_desc", "fecha_remate", "mejor_calificados"])
           .optional(),
       )
       .catch(undefined),
@@ -183,6 +192,7 @@ export const listRematesParamsSchema = z
       ciudad: params.ciudad,
       municipio: params.municipio,
       tipos: params.tipo,
+      tiposRemate: params.entidad,
       estados: params.estado,
       precioMin: params.min,
       precioMax: params.max,

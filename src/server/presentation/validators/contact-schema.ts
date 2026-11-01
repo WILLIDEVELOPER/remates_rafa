@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SERVICIOS_SOLICITADOS } from "../../domain/entities/contact-request.ts";
 import { checkEmail, checkPhone } from "../../domain/rules/contact-rules.ts";
 import { checkedField } from "./checked-field.ts";
 
@@ -18,6 +19,7 @@ export const contactRequestSchema = z.object({
     .trim()
     .min(10, "Cuéntanos un poco más (mínimo 10 caracteres).")
     .max(2000, "El mensaje no puede superar 2000 caracteres."),
+  servicio: z.enum(SERVICIOS_SOLICITADOS).optional(),
   remateId: z.uuid().nullish(),
   /** Campo trampa: los usuarios reales no lo ven ni lo llenan. */
   website: z.string().max(200).optional(),

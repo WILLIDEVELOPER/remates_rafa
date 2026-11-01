@@ -75,6 +75,13 @@ export function formatLocation(parts: string[]): string {
   return parts.filter((part, index) => part && parts.indexOf(part) === index).join(", ");
 }
 
+const rating = new Intl.NumberFormat("es-CO", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+
+/** Calificación promedio con un decimal: "4,6". */
+export function formatRating(value: number): string {
+  return rating.format(value);
+}
+
 /** Descuento del precio base frente al comercial, en porcentaje entero. */
 export function discountPercent(base: number, commercial: number | null): number | null {
   if (!commercial || commercial <= base) return null;

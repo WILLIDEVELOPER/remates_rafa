@@ -22,6 +22,7 @@ export class CreateContactRequest {
       email: input.email.trim().toLowerCase(),
       telefono: emptyToNull(input.telefono),
       mensaje: input.mensaje.trim(),
+      servicio: input.servicio ?? ("informacion" as const),
       remateId: input.remateId ?? null,
     };
 

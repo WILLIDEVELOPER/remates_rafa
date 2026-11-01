@@ -11,6 +11,7 @@ import {
 } from "@heroui/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Controller, useWatch, type Control } from "react-hook-form";
+import { StarRatingInput } from "@/components/ui/star-rating";
 import { useReviewForm } from "../hooks/use-review-form";
 import { REVIEW_MAX, type ReviewFormValues } from "../schemas/review-schema";
 
@@ -63,7 +64,7 @@ function Field({
 export function ReviewForm({ remateId, onSuccess }: ReviewFormProps) {
   const { form, step, goToReview, goBack, onSubmit } = useReviewForm({ remateId, onSuccess });
   const { control, register, formState } = form;
-  const comentario = useWatch({ control, name: "comentario" });
+  const comentario = useWatch({ control, name: "comentario" }) ?? "";
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
@@ -86,6 +87,27 @@ export function ReviewForm({ remateId, onSuccess }: ReviewFormProps) {
       </div>
 
       <div hidden={step !== 2} className="flex flex-col gap-4">
+        <Controller
+          control={control}
+          name="calificacion"
+          render={({ field, fieldState }) => (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-sm font-medium">Tu calificación</span>
+              <StarRatingInput
+                name={field.name}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                isInvalid={fieldState.invalid}
+              />
+              {fieldState.error ? (
+                <p role="alert" className="text-xs text-danger">
+                  {fieldState.error.message}
+                </p>
+              ) : null}
+            </div>
+          )}
+        />
         <Controller
           control={control}
           name="comentario"

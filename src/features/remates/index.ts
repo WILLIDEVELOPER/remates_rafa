@@ -1,4 +1,5 @@
 export * from "./constants";
+export { DianRequirements } from "./components/dian-requirements";
 export { RelatedRemates } from "./components/related-remates";
 export { RemateGallery } from "./components/remate-gallery";
 export { RemateLocation } from "./components/remate-location";

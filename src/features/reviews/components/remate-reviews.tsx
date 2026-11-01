@@ -1,5 +1,6 @@
 import { MessageSquareQuote } from "lucide-react";
 import { EmptyState } from "@/components/ui/empty-state";
+import { RatingSummary, StarRating } from "@/components/ui/star-rating";
 import { formatDate } from "@/lib/format";
 import { listPublicResenasAction } from "@/server/presentation/actions/resena-actions";
 import { ReviewDialog } from "./review-dialog";
@@ -7,9 +8,16 @@ import { ReviewDialog } from "./review-dialog";
 interface RemateReviewsProps {
   remateId: string;
   remateNombre: string;
+  calificacionPromedio: number | null;
+  calificacionesCount: number;
 }
 
-export async function RemateReviews({ remateId, remateNombre }: RemateReviewsProps) {
+export async function RemateReviews({
+  remateId,
+  remateNombre,
+  calificacionPromedio,
+  calificacionesCount,
+}: RemateReviewsProps) {
   const result = await listPublicResenasAction(remateId);
   // Si no se pueden leer las reseñas, la sección se omite en lugar de romper el detalle.
   if (!result.ok) return null;
@@ -23,6 +31,7 @@ export async function RemateReviews({ remateId, remateNombre }: RemateReviewsPro
           <h2 id="resenas" className="text-xl font-medium tracking-tight">
             Reseñas{total > 0 ? ` (${total})` : ""}
           </h2>
+          <RatingSummary promedio={calificacionPromedio} count={calificacionesCount} size="md" />
           <p className="text-sm text-muted">Opiniones de personas interesadas en este remate.</p>
         </div>
         <ReviewDialog remateId={remateId} remateNombre={remateNombre} />
@@ -51,6 +60,7 @@ export async function RemateReviews({ remateId, remateNombre }: RemateReviewsPro
                     {formatDate(review.createdAt)}
                   </time>
                 </div>
+                {review.calificacion ? <StarRating value={review.calificacion} size="sm" /> : null}
                 <p className="text-sm leading-relaxed break-words whitespace-pre-line text-muted">
                   {review.comentario}
                 </p>

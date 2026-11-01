@@ -4,6 +4,7 @@ export interface CreateResenaInput {
   email: string;
   telefono: string;
   comentario: string;
+  calificacion: number;
 }
 
 export interface UpdateResenaInput {
@@ -17,6 +18,8 @@ export interface PublicResenaDto {
   id: string;
   nombre: string;
   comentario: string;
+  /** 1 a 5; `null` en reseñas antiguas sin calificación. */
+  calificacion: number | null;
   /** ISO 8601 */
   createdAt: string;
 }

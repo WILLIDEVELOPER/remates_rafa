@@ -16,6 +16,7 @@ export function toContactRequestDto(request: ContactRequestWithRemate): ContactR
     email: request.email,
     telefono: request.telefono,
     mensaje: request.mensaje,
+    servicio: request.servicio,
     remateId: request.remateId,
     remateNombre: request.remateNombre,
     remateSlug: request.remateSlug,

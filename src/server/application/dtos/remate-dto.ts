@@ -1,11 +1,13 @@
 import type {
   EstadoRemate,
   TipoInmueble,
+  TipoRemate,
 } from "../../domain/entities/remate.ts";
 import type {
   RemateSort,
   RemateStats,
 } from "../../domain/repositories/remate-repository.ts";
+import type { PublicResenaDto } from "./resena-dto.ts";
 
 export interface RemateDto {
   id: string;
@@ -17,9 +19,13 @@ export interface RemateDto {
   municipio: string;
   direccion: string | null;
   tipoInmueble: TipoInmueble;
+  tipoRemate: TipoRemate;
+  /** 70 % del valor comercial: desde donde parte el remate. */
   precioBase: number;
   precioComercial: number | null;
-  area: number;
+  /** 40 % del valor comercial: lo que da derecho a participar. */
+  precioDerecho: number | null;
+  area: number | null;
   habitaciones: number | null;
   banos: number | null;
   estado: EstadoRemate;
@@ -37,6 +43,11 @@ export interface RemateDto {
   /** ISO 8601 */
   updatedAt: string;
   createdBy: string | null;
+  /** `null` mientras el remate no tenga reseñas calificadas. */
+  calificacionPromedio: number | null;
+  calificacionesCount: number;
+  /** Su mejor reseña, solo en los listados que la piden (`conMejorResena`); `null` en el resto. */
+  mejorResena: PublicResenaDto | null;
 }
 
 export interface ListRematesInput {
@@ -45,11 +56,14 @@ export interface ListRematesInput {
   ciudad?: string;
   municipio?: string;
   tipos?: TipoInmueble[];
+  tiposRemate?: TipoRemate[];
   estados?: EstadoRemate[];
   precioMin?: number;
   precioMax?: number;
   destacado?: boolean;
   activo?: boolean;
+  /** Adjunta a cada remate su mejor reseña (una consulta extra para toda la página). */
+  conMejorResena?: boolean;
   sort?: RemateSort;
   page?: number;
   pageSize?: number;
@@ -71,9 +85,12 @@ export interface CreateRemateInput {
   municipio: string;
   direccion?: string | null;
   tipoInmueble: TipoInmueble;
+  /** Por defecto, Rama Judicial. */
+  tipoRemate?: TipoRemate;
   precioBase: number;
   precioComercial?: number | null;
-  area: number;
+  precioDerecho?: number | null;
+  area?: number | null;
   habitaciones?: number | null;
   banos?: number | null;
   estado?: EstadoRemate;

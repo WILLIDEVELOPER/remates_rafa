@@ -1,6 +1,7 @@
 import { InvalidRemateError } from "../errors/invalid-remate-error.ts";
 import type { Checked } from "../rules/checked.ts";
 import { checkEmail, checkPhone } from "../rules/contact-rules.ts";
+import { checkCalificacion } from "../rules/rating-rules.ts";
 import {
   checkComentario,
   checkNombre,
@@ -24,10 +25,15 @@ export interface Resena {
   email: string;
   telefono: string;
   comentario: string;
+  /** 1 a 5 estrellas. `null` solo en reseñas anteriores a las calificaciones: no cuentan en el promedio. */
+  calificacion: number | null;
   createdAt: Date;
 }
 
-export type NewResena = Omit<Resena, "id" | "createdAt">;
+/** Toda reseña nueva trae calificación. */
+export type NewResena = Omit<Resena, "id" | "createdAt" | "calificacion"> & {
+  calificacion: number;
+};
 
 /** Lo único que el administrador puede corregir de una reseña. */
 export type ResenaChanges = Pick<Resena, "nombre" | "comentario">;
@@ -44,6 +50,7 @@ function unwrap<T>(result: Checked<T>): T {
 export function normalizeResena(input: NewResena): NewResena {
   return {
     remateId: input.remateId,
+    calificacion: unwrap(checkCalificacion(input.calificacion)),
     nombre: unwrap(checkNombre(input.nombre)),
     email: unwrap(checkEmail(input.email)),
     telefono: unwrap(checkPhone(input.telefono)),

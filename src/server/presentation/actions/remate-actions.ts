@@ -20,6 +20,7 @@ import { SetDestacadoRemate } from "../../application/use-cases/set-destacado.ts
 import { UpdateRemate } from "../../application/use-cases/update-remate.ts";
 import { db } from "../../infrastructure/db/client.ts";
 import { DrizzleRemateRepository } from "../../infrastructure/repositories/drizzle-remate-repository.ts";
+import { DrizzleResenaRepository } from "../../infrastructure/repositories/drizzle-resena-repository.ts";
 import { requireAdmin } from "../auth/require-admin.ts";
 import {
   createRemateSchema,
@@ -33,15 +34,16 @@ import {
 import { fail, ok, type ActionResult } from "./action-result.ts";
 
 const remateRepository = new DrizzleRemateRepository(db);
+const resenaRepository = new DrizzleResenaRepository(db);
 
 const createRemate = new CreateRemate(remateRepository);
 const updateRemate = new UpdateRemate(remateRepository);
 const deleteRemate = new DeleteRemate(remateRepository);
 const setDestacado = new SetDestacadoRemate(remateRepository);
-const listRemates = new ListRemates(remateRepository);
+const listRemates = new ListRemates(remateRepository, resenaRepository);
 const getRemateBySlug = new GetRemateBySlug(remateRepository);
 const getRemateById = new GetRemateById(remateRepository);
-const getRelatedRemates = new GetRelatedRemates(remateRepository);
+const getRelatedRemates = new GetRelatedRemates(remateRepository, resenaRepository);
 const getDashboardStats = new GetDashboardStats(remateRepository);
 const getCoverage = new GetCoverage(remateRepository);
 const listPublicEntries = new ListPublicRemateEntries(remateRepository);
@@ -63,7 +65,7 @@ export async function listRematesAction(
 ): Promise<ActionResult<ListRematesOutput>> {
   try {
     const input = listRematesParamsSchema.parse(params ?? {});
-    return ok(await listRemates.execute({ ...input, activo: true }));
+    return ok(await listRemates.execute({ ...input, activo: true, conMejorResena: true }));
   } catch (error) {
     return fail(error);
   }
@@ -76,6 +78,7 @@ export async function getFeaturedRematesAction(
     const { items } = await listRemates.execute({
       destacado: true,
       activo: true,
+      conMejorResena: true,
       pageSize: limit,
     });
     return ok(items);

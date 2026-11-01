@@ -1,11 +1,17 @@
 import { InvalidRemateError } from "../errors/invalid-remate-error.ts";
 
+/** Qué pide quien escribe: información general o la gestión del RUT como postor (DIAN). */
+export const SERVICIOS_SOLICITADOS = ["informacion", "gestion_rut"] as const;
+
+export type ServicioSolicitado = (typeof SERVICIOS_SOLICITADOS)[number];
+
 export interface ContactRequest {
   id: string;
   nombre: string;
   email: string;
   telefono: string | null;
   mensaje: string;
+  servicio: ServicioSolicitado;
   remateId: string | null;
   leida: boolean;
   createdAt: Date;

@@ -15,6 +15,7 @@ import { db } from "../../infrastructure/db/client.ts";
 import { DrizzleRemateRepository } from "../../infrastructure/repositories/drizzle-remate-repository.ts";
 import { DrizzleResenaRepository } from "../../infrastructure/repositories/drizzle-resena-repository.ts";
 import { requireAdmin } from "../auth/require-admin.ts";
+import { getClientIpHash } from "../http/client-ip.ts";
 import {
   createResenaSchema,
   remateResenasIdSchema,
@@ -33,6 +34,9 @@ const deleteResena = new DeleteResena(resenaRepository);
 
 /** Las reseñas se pintan en el detalle de cualquier remate: se refrescan todos. */
 function revalidateResenas() {
+  // El promedio y la mejor reseña también se ven en las tarjetas de la home y del listado.
+  revalidatePath("/");
+  revalidatePath("/remates");
   revalidatePath("/remates/[slug]", "page");
   revalidatePath("/admin/remates/[id]/editar", "page");
 }
@@ -60,7 +64,7 @@ export async function createResenaAction(
     // Honeypot: se responde como éxito para no delatar la trampa a los bots.
     if (website) return ok({ received: true });
 
-    await createResena.execute(data);
+    await createResena.execute(data, { ipHash: await getClientIpHash() });
     revalidateResenas();
     return ok({ received: true });
   } catch (error) {

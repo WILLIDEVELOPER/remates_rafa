@@ -9,6 +9,8 @@ export const TIPOS_INMUEBLE = [
   "finca",
 ] as const;
 
+export const TIPOS_REMATE = ["rama_judicial", "dian"] as const;
+
 export const ESTADOS_REMATE = [
   "disponible",
   "adjudicado",
@@ -35,6 +37,7 @@ export function isUploadedImageKey(value: string): boolean {
 }
 
 export type TipoInmueble = (typeof TIPOS_INMUEBLE)[number];
+export type TipoRemate = (typeof TIPOS_REMATE)[number];
 export type EstadoRemate = (typeof ESTADOS_REMATE)[number];
 
 export interface Remate {
@@ -47,9 +50,15 @@ export interface Remate {
   municipio: string;
   direccion: string | null;
   tipoInmueble: TipoInmueble;
+  /** Quién convoca el remate: Rama Judicial o DIAN. */
+  tipoRemate: TipoRemate;
+  /** Precio base: el 70 % del valor comercial, desde donde parte el remate. */
   precioBase: number;
+  /** Valor comercial (avalúo) del inmueble. */
   precioComercial: number | null;
-  area: number;
+  /** El 40 % que da derecho a participar en el remate. */
+  precioDerecho: number | null;
+  area: number | null;
   habitaciones: number | null;
   banos: number | null;
   estado: EstadoRemate;
@@ -62,9 +71,15 @@ export interface Remate {
   createdAt: Date;
   updatedAt: Date;
   createdBy: string | null;
+  /** Derivado de las reseñas con calificación (no se edita): `null` si aún no hay ninguna. */
+  calificacionPromedio: number | null;
+  calificacionesCount: number;
 }
 
-export type NewRemate = Omit<Remate, "id" | "createdAt" | "updatedAt">;
+export type NewRemate = Omit<
+  Remate,
+  "id" | "createdAt" | "updatedAt" | "calificacionPromedio" | "calificacionesCount"
+>;
 export type RemateChanges = Partial<Omit<NewRemate, "createdBy">>;
 
 type RemateRulesInput = Pick<
@@ -72,6 +87,7 @@ type RemateRulesInput = Pick<
   | "nombre"
   | "precioBase"
   | "precioComercial"
+  | "precioDerecho"
   | "area"
   | "habitaciones"
   | "banos"
@@ -108,7 +124,17 @@ export function assertRemateRules(remate: RemateRulesInput): void {
   if (remate.precioComercial !== null && !(remate.precioComercial > 0)) {
     throw new InvalidRemateError("El precio comercial debe ser mayor a cero.");
   }
-  if (!(remate.area > 0)) {
+  if (remate.precioDerecho !== null) {
+    if (!(remate.precioDerecho > 0)) {
+      throw new InvalidRemateError("El precio del 40 % debe ser mayor a cero.");
+    }
+    if (remate.precioDerecho >= remate.precioBase) {
+      throw new InvalidRemateError(
+        "El precio del 40 % (derecho a participar) debe ser menor al precio base del 70 %.",
+      );
+    }
+  }
+  if (remate.area !== null && !(remate.area > 0)) {
     throw new InvalidRemateError("El área debe ser mayor a cero.");
   }
   if (remate.habitaciones !== null && !isNonNegativeInteger(remate.habitaciones)) {

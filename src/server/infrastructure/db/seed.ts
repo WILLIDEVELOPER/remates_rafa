@@ -288,9 +288,12 @@ const seedRemates: SeedRemate[] = [
 const rows: NewRemateRow[] = seedRemates.map((r) => ({
   ...r,
   slug: generateSlug(r.nombre),
+  tipoRemate: "rama_judicial",
   precioBase: String(r.precioBase),
   precioComercial: r.precioComercial === null ? null : String(r.precioComercial),
-  area: String(r.area),
+  // El 40 % que da derecho a participar, sobre el valor comercial.
+  precioDerecho: r.precioComercial === null ? null : String(Math.round(r.precioComercial * 0.4)),
+  area: r.area === null ? null : String(r.area),
   imagenPrincipal: r.imagenes[0] ?? null,
 }));
 

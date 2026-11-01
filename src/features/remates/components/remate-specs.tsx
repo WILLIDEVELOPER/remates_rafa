@@ -3,6 +3,7 @@ import {
   BedDouble,
   Building2,
   CalendarDays,
+  Gavel,
   Percent,
   Ruler,
   Tag,
@@ -11,10 +12,23 @@ import {
 import type { ReactNode } from "react";
 import type { RemateDto } from "@/server/application/dtos/remate-dto";
 import { EstadoChip } from "@/components/ui/estado-chip";
+import { TipoRemateChip } from "@/components/ui/tipo-remate-chip";
+import { PRICE_HELP } from "@/components/ui/remate-prices";
 import { discountPercent, formatArea, formatCOP, formatDate } from "@/lib/format";
 import { TIPO_LABELS } from "@/lib/remate-labels";
 
-function Spec({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
+function Spec({
+  icon,
+  label,
+  help,
+  children,
+}: {
+  icon: ReactNode;
+  label: string;
+  /** Explicación breve de qué significa el dato. */
+  help?: string;
+  children: ReactNode;
+}) {
   return (
     <div className="flex min-w-0 flex-col gap-1.5 rounded-xl border border-border p-4">
       <dt className="flex items-center gap-2 text-xs text-muted">
@@ -22,6 +36,7 @@ function Spec({ icon, label, children }: { icon: ReactNode; label: string; child
         {label}
       </dt>
       <dd className="text-sm font-medium">{children}</dd>
+      {help ? <dd className="text-xs text-muted">{help}</dd> : null}
     </div>
   );
 }
@@ -36,11 +51,16 @@ export function RemateSpecs({ remate }: { remate: RemateDto }) {
         Ficha técnica
       </h2>
       <dl className="grid gap-3 sm:grid-cols-2">
-        <Spec icon={<Wallet className={iconClass} />} label="Precio base">
+        <Spec icon={<Wallet className={iconClass} />} label="Precio base (70 %)" help={PRICE_HELP.base}>
           {formatCOP(remate.precioBase)}
         </Spec>
+        {remate.precioDerecho ? (
+          <Spec icon={<Percent className={iconClass} />} label="Derecho a participar (40 %)" help={PRICE_HELP.derecho}>
+            {formatCOP(remate.precioDerecho)}
+          </Spec>
+        ) : null}
         {remate.precioComercial ? (
-          <Spec icon={<Tag className={iconClass} />} label="Precio comercial">
+          <Spec icon={<Tag className={iconClass} />} label="Precio comercial" help={PRICE_HELP.comercial}>
             {formatCOP(remate.precioComercial)}
           </Spec>
         ) : null}
@@ -49,12 +69,17 @@ export function RemateSpecs({ remate }: { remate: RemateDto }) {
             {discount} %
           </Spec>
         ) : null}
+        <Spec icon={<Gavel className={iconClass} />} label="Tipo de remate">
+          <TipoRemateChip tipo={remate.tipoRemate} size="md" />
+        </Spec>
         <Spec icon={<Building2 className={iconClass} />} label="Tipo de inmueble">
           {TIPO_LABELS[remate.tipoInmueble]}
         </Spec>
-        <Spec icon={<Ruler className={iconClass} />} label="Área">
-          {formatArea(remate.area)}
-        </Spec>
+        {remate.area !== null ? (
+          <Spec icon={<Ruler className={iconClass} />} label="Área">
+            {formatArea(remate.area)}
+          </Spec>
+        ) : null}
         {remate.habitaciones !== null ? (
           <Spec icon={<BedDouble className={iconClass} />} label="Habitaciones">
             {remate.habitaciones}

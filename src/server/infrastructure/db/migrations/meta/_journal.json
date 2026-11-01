@@ -36,6 +36,20 @@
       "when": 1793415348256,
       "tag": "0004_resenas",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793494600028,
+      "tag": "0005_tipo_remate_precios_calificaciones",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1793496529486,
+      "tag": "0006_limites_resenas",
+      "breakpoints": true
     }
   ]
 }
