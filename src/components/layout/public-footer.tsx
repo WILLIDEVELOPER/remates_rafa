@@ -1,6 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/branding/logo";
+import { ZONAS, zonaPath } from "@/lib/seo-zones";
 import { NAV_LINKS, SITE } from "@/lib/site";
 
 const LEGAL_LINKS = [
@@ -17,8 +18,20 @@ export function PublicFooter() {
             <Logo tone="light" />
             <p className="max-w-md text-sm text-muted">
               Conectamos a compradores con oportunidades de vivienda en remate
-              en toda Colombia, con respaldo jurídico y total transparencia.
+              judicial en Bucaramanga, Santander y toda Colombia, con respaldo
+              jurídico y total transparencia.
             </p>
+            <nav aria-label="Remates por zona">
+              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted">
+                {ZONAS.map((zona) => (
+                  <li key={zona.slug}>
+                    <Link href={zonaPath(zona)} className="transition-colors hover:text-foreground">
+                      Remates judiciales en {zona.nombre}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
 
           <nav aria-label="Navegación del pie de página" className="flex flex-col gap-3">

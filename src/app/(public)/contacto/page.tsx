@@ -4,10 +4,10 @@ import { ContactForm } from "@/features/contact";
 import { SITE } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Contacto",
+  title: "Contacto y asesoría en remates judiciales en Bucaramanga",
   alternates: { canonical: "/contacto" },
   description:
-    "Escríbenos o llámanos: un asesor te ayudará a encontrar el remate que mejor se ajusta a tu presupuesto.",
+    "Asesoría en remates judiciales en Bucaramanga y Santander: escríbenos o llámanos y un asesor te ayudará a elegir el remate que se ajusta a tu presupuesto.",
 };
 
 const CONTACT_ITEMS = [

@@ -37,19 +37,19 @@ export function Hero33() {
               variant="tertiary"
               className="h-7 w-fit rounded-full border border-foreground bg-transparent px-3 py-1 text-sm font-normal text-foreground"
             >
-              Remates judiciales en Colombia
+              Remates judiciales y de la DIAN
             </Chip>
             <h1 className="text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-              Encuentra oportunidades inmobiliarias únicas en remates
-              judiciales en toda Colombia
+              Remates judiciales en Bucaramanga y Santander: inmuebles bajo
+              el avalúo comercial
             </h1>
           </div>
 
           <div className="flex max-w-[30.625rem] flex-col gap-3 sm:gap-4 lg:shrink-0 lg:gap-8">
             <p className="text-base text-foreground sm:text-lg">
-              Casas, apartamentos, lotes y locales con precios por debajo del
-              mercado, saneamiento jurídico y acompañamiento en cada paso del
-              proceso.
+              Casas, apartamentos, lotes y locales con precio base por debajo
+              del avalúo, saneamiento jurídico y acompañamiento en cada paso
+              del proceso. También publicamos remates en el resto de Colombia.
             </p>
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <LinkButton

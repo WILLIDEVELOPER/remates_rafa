@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { SITE } from "@/lib/site";
 
-export const alt = `${SITE.name} | Remates de vivienda en Colombia`;
+export const alt = `${SITE.name} | ${SITE.tagline}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -34,10 +34,10 @@ export default async function OpengraphImage() {
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ fontSize: 76, fontWeight: 600, lineHeight: 1.05, letterSpacing: -2 }}>
-            Oportunidades inmobiliarias en remate
+            Remates judiciales en Bucaramanga y Santander
           </div>
           <div style={{ fontSize: 34, color: "#a1a1aa" }}>
-            Casas, apartamentos, lotes y locales en toda Colombia
+            Casas, apartamentos, lotes y locales en remate en toda Colombia
           </div>
         </div>
       </div>

@@ -19,7 +19,7 @@ import {
 } from "@/features/remates";
 import { RemateReviews } from "@/features/reviews";
 import { formatCOP, formatDate, formatLocation } from "@/lib/format";
-import { TIPO_LABELS, TIPO_REMATE_LABELS } from "@/lib/remate-labels";
+import { TIPO_LABELS } from "@/lib/remate-labels";
 import { getBaseUrl, SITE } from "@/lib/site";
 import { getRemateBySlugAction } from "@/server/presentation/actions/remate-actions";
 
@@ -41,7 +41,7 @@ export async function generateMetadata({
   if (!result.ok) return { title: "Remate no encontrado" };
 
   const remate = result.data;
-  const description = `Remate ${TIPO_REMATE_LABELS[remate.tipoRemate]}: ${TIPO_LABELS[remate.tipoInmueble]} en ${remate.municipio}, ${remate.departamento}. Precio base (70 %) ${formatCOP(remate.precioBase)}. ${remate.descripcion}`.slice(0, 200);
+  const description = `Remate ${remate.tipoRemate === "dian" ? "de la DIAN" : "judicial"}: ${TIPO_LABELS[remate.tipoInmueble]} en ${remate.municipio}, ${remate.departamento}. Precio base (70 %) ${formatCOP(remate.precioBase)}. ${remate.descripcion}`.slice(0, 200);
 
   return {
     title: remate.nombre,
